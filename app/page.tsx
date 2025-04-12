@@ -28,14 +28,14 @@ export default function Home() {
       <h1>Hola</h1>
       {/* <MonthlyView onDaySelect={(day) => setSelectedDay(day)} /> */}
 
-      {selectedDay && (
+      {/* {selectedDay && (
         <IncomeEditor
           isOpen={!!selectedDay}
           onClose={() => setSelectedDay(null)}
           date={selectedDay}
           sources={sources}
         />
-      )}
+      )} */}
     </main>
   )
 }
