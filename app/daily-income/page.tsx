@@ -3,16 +3,19 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { log } from 'node:console'
-
+type Source = {
+  id: string
+  name: string
+}
 export default function DailyIncomePage() {
-  const [sources, setSources] = useState([])
+  const [sources, setSources] = useState<Source[]>([])
   const [form, setForm] = useState<Record<string, number>>({})
   const [date, setDate] = useState<string>(new Date().toISOString().slice(0, 10))
 
   useEffect(() => {
     const fetchSources = async () => {
       const { data } = await supabase.from('sources').select('*')
-      setSources(data)
+      if (data) setSources(data)
     }
     fetchSources()
   }, [])
