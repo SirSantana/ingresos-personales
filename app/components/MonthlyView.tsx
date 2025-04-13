@@ -1,7 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { format, parseISO, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns'
+import {
+  format,
+  parseISO,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval
+} from 'date-fns'
 import { es } from 'date-fns/locale'
 import { supabase } from '@/lib/supabaseClient'
 
@@ -33,15 +39,17 @@ const groupIncomesByCreatedAt = (data: { created_at: string; amount: number }[])
 export default function MonthlyView({
   selectedDate,
   onDaySelect,
-  reloadKey, // <- nueva prop
+  reloadKey,
 }: {
   selectedDate: Date
   onDaySelect: (date: Date) => void
-  reloadKey?: number // <- opcional, para refrescar sin cambiar la fecha
+  reloadKey?: number
 }) {
   const [days, setDays] = useState<Date[]>([])
   const [monthlyTotals, setMonthlyTotals] = useState<Record<string, number>>({})
+  const [yearlyTotal, setYearlyTotal] = useState<number>(0)
 
+  // Calcular días del mes
   useEffect(() => {
     const start = startOfMonth(selectedDate)
     const end = endOfMonth(selectedDate)
@@ -49,20 +57,62 @@ export default function MonthlyView({
     setDays(allDays)
   }, [selectedDate])
 
+  // Traer ingresos del mes
   useEffect(() => {
+    // const loadMonthly = async () => {
+    //   const rawData = await fetchIncomesOfMonth(selectedDate)
+    //   const grouped = groupIncomesByCreatedAt(rawData)
+    //   setMonthlyTotals(grouped)
+    // }
+    // loadMonthly()
+
     const loadMonthly = async () => {
-      const rawData = await fetchIncomesOfMonth(selectedDate)
-      const grouped = groupIncomesByCreatedAt(rawData)
-      setMonthlyTotals(grouped)
+      const start = startOfMonth(selectedDate).toISOString()
+      const end = endOfMonth(selectedDate).toISOString()
+      const { data, error } = await supabase.rpc('get_incomes_between_dates', {
+        start_date: start.split('T')[0], // o directamente el Date.toISOString().slice(0, 10)
+        end_date: end.split('T')[0],
+      })
+      
+      if (error) {
+        console.error('Error fetching monthly incomes:', error)
+        return []
+      }
+      console.log(data, 'mes');
+      
+      return data
     }
-    loadMonthly()
+    loadMonthly().then(setMonthlyTotals)
+
   }, [selectedDate, reloadKey])
+
+  // Traer ingresos del año completo
+  useEffect(() => {
+    const fetchYearlyTotal = async () => {
+      const { data, error } = await supabase.rpc('get_total_income_by_year', {
+        year: 2025,
+      })
+      
+      if (error) {
+        console.error('Error al traer total del año:', error)
+      } else {
+        console.log('Ingresos del año:', data)
+        setYearlyTotal(data || 0)
+      }
+    }
+
+    fetchYearlyTotal()
+  }, [selectedDate])
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <h2 className="text-3xl font-semibold text-gray-800 mb-8">
+      <h2 className="text-3xl font-semibold text-gray-800 mb-2">
         Ingresos de {format(selectedDate, 'MMMM yyyy', { locale: es })}
       </h2>
+
+      <p className="text-gray-600 text-lg mb-8">
+        Total del año: <span className="font-semibold text-green-700">${yearlyTotal.toFixed(2)}</span>
+      </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {days.map((day) => {
