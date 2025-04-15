@@ -12,7 +12,7 @@ type Source = {
 
 type FormValue = {
   amount: string
-  id?: string // id del income si ya existe
+  id?: string
 }
 
 type Props = {
@@ -21,46 +21,35 @@ type Props = {
   onClose: () => void
   sources: Source[]
   onSave: () => void
+  existingIncomes: {
+    id: string
+    source_id: string
+    amount: number
+    created_at: string
+  }[]
 }
 
-export default function IncomeEditor({ date, isOpen, onClose, sources, onSave }: Props) {
+export default function IncomeEditor({
+  date,
+  isOpen,
+  onClose,
+  sources,
+  onSave,
+  existingIncomes
+}: Props) {
   const [form, setForm] = useState<{ [key: string]: FormValue }>({})
   const [loading, setLoading] = useState(false)
-  const [loadingIncomes, setLoadingIncomes] = useState(false)
 
   useEffect(() => {
-    const fetchIncomes = async () => {
-      setLoadingIncomes(true)
-      const formattedDate = date.toISOString().split('T')[0]
-
-      const { data, error } = await supabase
-        .from('daily_incomes')
-        .select('id, source_id, amount, created_at')
-        .gte('created_at', `${formattedDate}T00:00:00.000Z`)
-        .lt('created_at', `${formattedDate}T23:59:59.999Z`)
-
-      if (error) {
-        console.error('Error fetching incomes:', error)
-        setLoadingIncomes(false)
-        return
+    const prefill: { [key: string]: FormValue } = {}
+    existingIncomes?.forEach((row) => {
+      prefill[row.source_id] = {
+        amount: row.amount.toString(),
+        id: row.id,
       }
-
-      const prefill: { [key: string]: FormValue } = {}
-      data?.forEach((row) => {
-        prefill[row.source_id] = {
-          amount: row.amount.toString(),
-          id: row.id,
-        }
-      })
-
-      setForm(prefill)
-      setLoadingIncomes(false)
-    }
-
-    if (isOpen) {
-      fetchIncomes()
-    }
-  }, [isOpen, date])
+    })
+    setForm(prefill)
+  }, [existingIncomes, isOpen])
 
   const handleChange = (sourceId: string, value: string) => {
     setForm((prev) => ({
@@ -70,6 +59,8 @@ export default function IncomeEditor({ date, isOpen, onClose, sources, onSave }:
         amount: value,
       },
     }))
+    console.log(form, value);
+    
   }
 
   const handleSave = async () => {
@@ -77,7 +68,7 @@ export default function IncomeEditor({ date, isOpen, onClose, sources, onSave }:
 
     const entries = Object.entries(form).filter(([_, value]) => {
       const n = parseFloat(value.amount)
-      return !isNaN(n) && n > 0
+      return !isNaN(n)
     })
 
     const createdAt = new Date(date.setHours(8, 0, 0, 0)).toISOString()
@@ -86,7 +77,6 @@ export default function IncomeEditor({ date, isOpen, onClose, sources, onSave }:
       const numericAmount = parseFloat(amount)
 
       if (id) {
-        // Actualizar si ya existe
         await supabase
           .from('daily_incomes')
           .update({
@@ -95,7 +85,6 @@ export default function IncomeEditor({ date, isOpen, onClose, sources, onSave }:
           })
           .eq('id', id)
       } else {
-        // Insertar si no existe
         await supabase
           .from('daily_incomes')
           .insert({
@@ -123,27 +112,23 @@ export default function IncomeEditor({ date, isOpen, onClose, sources, onSave }:
             Ingresos del {format(date, 'dd MMMM yyyy')}
           </Dialog.Title>
 
-          {loadingIncomes ? (
-            <div className="text-center text-gray-500 py-12">Cargando ingresos...</div>
-          ) : (
-            <div className="space-y-5">
-              {sources.map((source) => (
-                <div key={source.id}>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">
-                    {source.name}
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={form[source.id]?.amount || ''}
-                    onChange={(e) => handleChange(source.id, e.target.value)}
-                    className="w-full rounded-xl border border-gray-300 px-4 py-2 text-gray-800 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
-                    placeholder="0.00"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="space-y-5">
+            {sources.map((source) => (
+              <div key={source.id}>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  {source.name}
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={form[source.id]?.amount || ''}
+                  onChange={(e) => handleChange(source.id, e.target.value)}
+                  className="w-full rounded-xl border border-gray-300 px-4 py-2 text-gray-800 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                  placeholder="0.00"
+                />
+              </div>
+            ))}
+          </div>
 
           <div className="flex justify-end gap-3 mt-8">
             <button
