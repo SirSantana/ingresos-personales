@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
+import { Income } from '../types/income'
 
 export function useIncomeByMonth(year: number, month: number,  reloadKey = 0) {
   const [total, setTotal] = useState<number>(0)
   const [loading, setLoading] = useState(true)
-  const [incomes, setIncomes] = useState<{ created_at: string, amount: number }[]>([])
+  const [incomes, setIncomes] = useState<Income[]>([])
 
   useEffect(() => {
     const fetchData = async () => {

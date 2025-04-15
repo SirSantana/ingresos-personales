@@ -11,28 +11,28 @@ import { useIncomeByMonth } from "../hooks/useIncomeByMonth"
 
 export default function DashboardPage() {
   const [date, setDate] = useState(new Date())
-  const [incomes, setIncomes] = useState<number>(0)
-  useEffect(() => {
-    fetchIncomes()
-  }, [date])
+  // const [incomes, setIncomes] = useState<number>(0)
+  // useEffect(() => {
+  //   fetchIncomes()
+  // }, [date])
   
-  const fetchIncomes = async () => {
-    const startOfMonth = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-01`;
-    const startOfNextMonth = `${date.getFullYear()}-${(date.getMonth() + 2).toString().padStart(2, '0')}-01`;
+  // const fetchIncomes = async () => {
+  //   const startOfMonth = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-01`;
+  //   const startOfNextMonth = `${date.getFullYear()}-${(date.getMonth() + 2).toString().padStart(2, '0')}-01`;
   
-    const { data, error } = await supabase
-      .from('daily_incomes')
-      .select('amount')
-      .filter('created_at', 'gte', startOfMonth)
-      .filter('created_at', 'lt', startOfNextMonth)
+  //   const { data, error } = await supabase
+  //     .from('daily_incomes')
+  //     .select('amount')
+  //     .filter('created_at', 'gte', startOfMonth)
+  //     .filter('created_at', 'lt', startOfNextMonth)
   
-    if (error) {
-      console.error('Error fetching incomes:', error)
-    } else {
-      const totalIncome = data?.reduce((sum, row) => sum + row.amount, 0) || 0
-      setIncomes(totalIncome)
-    }
-  }
+  //   if (error) {
+  //     console.error('Error fetching incomes:', error)
+  //   } else {
+  //     const totalIncome = data?.reduce((sum, row) => sum + row.amount, 0) || 0
+  //     setIncomes(totalIncome)
+  //   }
+  // }
 
 
   const [month, setMonth] = useState<number | null>(null)
@@ -50,7 +50,6 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchTotalYear()
   }, [year])
-  console.log(date);
   
   return (
     <DashboardLayout>

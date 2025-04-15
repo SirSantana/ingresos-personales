@@ -12,6 +12,7 @@ import {
 import { es } from 'date-fns/locale'
 import { useIncomeByMonth } from '../hooks/useIncomeByMonth'
 import IncomeEditor from './IncomeEditor'
+import { Income } from '../types/income'
 
 const sources = [
   { id: '6b8f9bc2-49e3-4d04-bd73-aa0bd3f40d58', name: 'YouTube Llanta Pinchada TV' },
@@ -46,7 +47,7 @@ export default function MonthlyView({
   const [selectedDay, setSelectedDay] = useState<Date | null>(null)
   const [reloadKey, setReloadKey] = useState(0)
 
-  const { incomes, loading } = useIncomeByMonth(year, month || 1, reloadKey)
+  const { incomes=[], loading } = useIncomeByMonth(year, month || 1, reloadKey)
   const incomeMap = groupIncomesByCreatedAt(incomes)
 
   useEffect(() => {
@@ -55,9 +56,10 @@ export default function MonthlyView({
     setDays(eachDayOfInterval({ start, end }))
   }, [selectedDate, reloadKey])
 
-  const getIncomesByDay = (day: Date) => {
-    return incomes.filter((i) => isSameDay(parseISO(i.created_at), day))
+  const getIncomesByDay = (day: Date): Income[] => {
+    return incomes.filter((i) => isSameDay(parseISO(i.created_at), day)) || []
   }
+  
   return (
     <>
       <div className="p-6 max-w-7xl mx-auto">
