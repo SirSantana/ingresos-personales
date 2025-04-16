@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   format,
   parseISO,
@@ -12,28 +12,23 @@ import { es } from 'date-fns/locale'
 import dynamic from 'next/dynamic'
 import { useIncomeByMonth } from '../hooks/useIncomeByMonth'
 import { Income } from '../types/income'
+import { sources } from './IncomeReportChart'
 
 // Lazy load del editor
 const IncomeEditor = dynamic(() => import('./IncomeEditor'), { ssr: false })
 
-const sources = [
-  { id: '6b8f9bc2-49e3-4d04-bd73-aa0bd3f40d58', name: 'YouTube Llanta Pinchada TV' },
-  { id: '841b8e44-d99a-4152-ac14-ec497508cc21', name: 'YouTube Flat Tire TV' },
-  { id: '4b872fac-31d5-4a69-924a-ebb728fc7b67', name: 'YouTube Pneu Furado TV' },
-  { id: '3f4b4234-4678-4f08-93cc-02d1cdd106e7', name: 'Facebook Quarks-Automotriz' },
-  { id: 'af0e5bf0-ee62-4031-aad3-7e7af56d6f9b', name: 'Facebook Quarks-Motos' },
-  { id: '3a99e3e2-ee7d-4c71-bdd6-18ec72d0b414', name: 'TikTok Llanta Pinchada TV' },
-  { id: '8efd713b-5778-440d-b9d0-e16e0a566390', name: 'Mercado Libre' },
-]
+
 
 export default function MonthlyView({
   selectedDate,
   year,
-  month
+  month,
+  setIncomeMonth
 }: {
   selectedDate: Date
   year: number
-  month?: number
+  month?: number,
+  setIncomeMonth: (income: number) => void
 }) {
   const [selectedDayStr, setSelectedDayStr] = useState<string | null>(null)
   const [reloadKey, setReloadKey] = useState(0)
@@ -55,6 +50,15 @@ export default function MonthlyView({
     })
     return map
   }, [incomes])
+
+  const totalIncome = useMemo(() => {
+    return incomes.reduce((acc, curr) => acc + curr.amount, 0)
+  }, [incomes])
+
+  // ✅ Propagamos al padre en un efecto, pero sin causar doble render innecesario
+  useEffect(() => {
+    setIncomeMonth(totalIncome)
+  }, [totalIncome, setIncomeMonth])
 
   const incomeDetailsMap = useMemo(() => {
     const map: Record<string, Income[]> = {}
@@ -81,6 +85,13 @@ export default function MonthlyView({
           {days.map((day) => {
             const key = format(day, 'yyyy-MM-dd')
             const total = incomeMap[key] || 0
+            const incomesOfDay = incomeDetailsMap[key] || []
+
+            const bySource: Record<string, number> = {}
+            incomesOfDay.forEach((inc) => {
+              if (!bySource[inc.source_id]) bySource[inc.source_id] = 0
+              bySource[inc.source_id] += inc.amount
+            })
 
             return (
               <div
@@ -88,20 +99,43 @@ export default function MonthlyView({
                 className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between"
               >
                 <div>
-                  <h3 className="text-base text-gray-700 font-semibold">
-                    {format(day, 'd MMMM', { locale: es })}
-                  </h3>
                   {total > 0 ? (
-                    <p className="text-green-600 font-bold text-sm mt-2">
-                      ${total.toFixed(2)}
-                    </p>
+                    <>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                        <h2 style={{ fontSize: '24px', margin: 0, fontWeight: 600, color: '#111827' }}>
+                          ${total.toFixed(2)}
+                        </h2>
+                        <span style={{ fontSize: '14px', color: '#6b7280', fontWeight: 500 }}>
+                          {format(day, 'd MMMM', { locale: es })}
+                        </span>
+                      </div>
+
+                      <ul className="mt-4 space-y-3">
+                        {Object.entries(bySource).map(([sourceId, amount], i) => {
+                          const source = sources.find(s => s.id === sourceId)
+
+                          return (
+                            <li key={i} className="flex items-center gap-3 text-sm text-gray-700">
+                              {/* Logo redondo */}
+
+
+                              {/* Nombre + monto */}
+                              <div className="flex justify-between items-center w-full">
+                                <span className="truncate">{source?.name}</span>
+                                <span className="font-medium text-gray-900">${amount.toFixed(2)}</span>
+                              </div>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    </>
                   ) : (
-                    <p className="text-gray-400 text-sm mt-2">Sin ingresos</p>
+                    <p className="text-gray-400 text-sm mt-3 italic">Sin Registros</p>
                   )}
                 </div>
 
                 <button
-                  className="mt-4 text-sm bg-blue-600 text-white font-medium py-2 px-4 rounded-xl hover:bg-blue-700 transition"
+                  className="mt-5 text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl transition-all"
                   onClick={() => setSelectedDayStr(key)}
                 >
                   Agregar / Editar ingresos

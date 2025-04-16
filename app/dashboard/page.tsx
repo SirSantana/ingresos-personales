@@ -14,6 +14,7 @@ import IncomeReportChart from "../components/IncomeReportChart"
 export default function DashboardPage() {
   const [date, setDate] = useState(new Date())
   const [modeGlobal, setModeGlobal] = useState('month')
+  const [incomeMonth, setIncomeMonth] = useState<number>(0)
   // const [incomes, setIncomes] = useState<number>(0)
   // useEffect(() => {
   //   fetchIncomes()
@@ -49,7 +50,7 @@ export default function DashboardPage() {
     const { data, error } = await supabase.rpc('get_total_income_by_year', { year: year })
     if (!error) setTotalYear(data || 0)
   }
-
+ 
   useEffect(() => {
     fetchTotalYear()
   }, [year])
@@ -61,9 +62,9 @@ export default function DashboardPage() {
         <p className="text-gray-500 text-sm">Ingreso total del año:</p>
         <p className="text-3xl font-semibold text-green-600">${totalYear.toLocaleString()}</p>
       </div> */}
-      <IncomeOverview totalIncome={totalYear} goal={25000} />
+      <IncomeOverview totalIncome={modeGlobal === 'month' ? incomeMonth : totalYear} goal={modeGlobal==='month' ? 2500: 25000} modeGlobal={modeGlobal} />
       {modeGlobal === 'month' && (
-        <MonthlyView selectedDate={date} year={year} month={date.getMonth() + 1} />
+        <MonthlyView selectedDate={date} year={year} month={date.getMonth() + 1} setIncomeMonth={setIncomeMonth} />
       )}
       {modeGlobal === 'year' &&  <IncomeReportChart />}
      

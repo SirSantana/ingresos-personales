@@ -4,7 +4,7 @@ import Image from 'next/image'
 
 let meses
 
-const sources = [
+export const sources = [
   {
     id: '6b8f9bc2-49e3-4d04-bd73-aa0bd3f40d58',
     name: 'YouTube Llanta Pinchada TV',
@@ -86,7 +86,8 @@ export default function IncomeStats() {
   const sourceData = getSourceData()
   const averageIncome = getAverageIncome()
   const top3Sources = getTop3Sources()
-  console.log(monthlyData);
+
+  
   function cleanSourceName(name: string) {
     return name
       .replace(/YouTube\s?/i, '')
