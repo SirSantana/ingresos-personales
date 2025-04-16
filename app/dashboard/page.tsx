@@ -8,9 +8,12 @@ import { supabase } from "@/lib/supabaseClient"
 import MonthlyView from "../components/MonthlyView"
 import IncomeEditor from "../components/IncomeEditor"
 import { useIncomeByMonth } from "../hooks/useIncomeByMonth"
+import YearlyIncomeView from "../components/YearlyIncomeView"
+import IncomeReportChart from "../components/IncomeReportChart"
 
 export default function DashboardPage() {
   const [date, setDate] = useState(new Date())
+  const [modeGlobal, setModeGlobal] = useState('month')
   // const [incomes, setIncomes] = useState<number>(0)
   // useEffect(() => {
   //   fetchIncomes()
@@ -53,13 +56,19 @@ export default function DashboardPage() {
   
   return (
     <DashboardLayout>
-      <Header selectedDate={date} onChange={setDate} />
+      <Header setModeGlobal={setModeGlobal} selectedDate={date} onChange={setDate} />
       {/* <div>
         <p className="text-gray-500 text-sm">Ingreso total del año:</p>
         <p className="text-3xl font-semibold text-green-600">${totalYear.toLocaleString()}</p>
       </div> */}
       <IncomeOverview totalIncome={totalYear} goal={25000} />
-      <MonthlyView  selectedDate={date}  year={year} month={date.getMonth() + 1}/>
+      {modeGlobal === 'month' && (
+        <MonthlyView selectedDate={date} year={year} month={date.getMonth() + 1} />
+      )}
+      {modeGlobal === 'year' &&  <IncomeReportChart />}
+     
+
+      {/* <YearlyIncomeView year={year} /> */}
       {/* IncomeTable opcional */}
       {/* {selectedDay && (
         <IncomeEditor

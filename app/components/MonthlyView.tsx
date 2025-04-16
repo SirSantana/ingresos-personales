@@ -1,18 +1,20 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import {
   format,
   parseISO,
   startOfMonth,
   endOfMonth,
-  eachDayOfInterval,
-  isSameDay
+  eachDayOfInterval
 } from 'date-fns'
 import { es } from 'date-fns/locale'
+import dynamic from 'next/dynamic'
 import { useIncomeByMonth } from '../hooks/useIncomeByMonth'
-import IncomeEditor from './IncomeEditor'
 import { Income } from '../types/income'
+
+// Lazy load del editor
+const IncomeEditor = dynamic(() => import('./IncomeEditor'), { ssr: false })
 
 const sources = [
   { id: '6b8f9bc2-49e3-4d04-bd73-aa0bd3f40d58', name: 'YouTube Llanta Pinchada TV' },
@@ -24,42 +26,50 @@ const sources = [
   { id: '8efd713b-5778-440d-b9d0-e16e0a566390', name: 'Mercado Libre' },
 ]
 
-function groupIncomesByCreatedAt(data: { created_at: string; amount: number }[]) {
-  const map: Record<string, number> = {}
-  data.forEach(({ created_at, amount }) => {
-    const dateKey = format(parseISO(created_at), 'yyyy-MM-dd')
-    if (!map[dateKey]) map[dateKey] = 0
-    map[dateKey] += amount
-  })
-  return map
-}
-
 export default function MonthlyView({
   selectedDate,
   year,
   month
 }: {
   selectedDate: Date
-  year: number,
+  year: number
   month?: number
 }) {
-  const [days, setDays] = useState<Date[]>([])
-  const [selectedDay, setSelectedDay] = useState<Date | null>(null)
+  const [selectedDayStr, setSelectedDayStr] = useState<string | null>(null)
   const [reloadKey, setReloadKey] = useState(0)
 
-  const { incomes=[], loading } = useIncomeByMonth(year, month || 1, reloadKey)
-  const incomeMap = groupIncomesByCreatedAt(incomes)
-
-  useEffect(() => {
+  const { incomes = [], loading } = useIncomeByMonth(year, month || 1, reloadKey)
+  
+  const days = useMemo(() => {
     const start = startOfMonth(selectedDate)
     const end = endOfMonth(selectedDate)
-    setDays(eachDayOfInterval({ start, end }))
+    return eachDayOfInterval({ start, end })
   }, [selectedDate, reloadKey])
 
-  const getIncomesByDay = (day: Date): Income[] => {
-    return incomes.filter((i) => isSameDay(parseISO(i.created_at), day)) || []
-  }
-  
+  const incomeMap = useMemo(() => {
+    const map: Record<string, number> = {}
+    incomes.forEach(({ created_at, amount }) => {
+      const dateKey = format(parseISO(created_at), 'yyyy-MM-dd')
+      if (!map[dateKey]) map[dateKey] = 0
+      map[dateKey] += amount
+    })
+    return map
+  }, [incomes])
+
+  const incomeDetailsMap = useMemo(() => {
+    const map: Record<string, Income[]> = {}
+    incomes.forEach((income) => {
+      const dateKey = format(parseISO(income.created_at), 'yyyy-MM-dd')
+      if (!map[dateKey]) map[dateKey] = []
+      map[dateKey].push(income)
+    })
+    return map
+  }, [incomes])
+
+  const selectedDay = useMemo(() => {
+    return selectedDayStr ? parseISO(selectedDayStr) : null
+  }, [selectedDayStr])
+
   return (
     <>
       <div className="p-6 max-w-7xl mx-auto">
@@ -74,7 +84,7 @@ export default function MonthlyView({
 
             return (
               <div
-                key={day.toISOString()}
+                key={key}
                 className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between"
               >
                 <div>
@@ -92,7 +102,7 @@ export default function MonthlyView({
 
                 <button
                   className="mt-4 text-sm bg-blue-600 text-white font-medium py-2 px-4 rounded-xl hover:bg-blue-700 transition"
-                  onClick={() => setSelectedDay(day)}
+                  onClick={() => setSelectedDayStr(key)}
                 >
                   Agregar / Editar ingresos
                 </button>
@@ -105,11 +115,11 @@ export default function MonthlyView({
       {selectedDay && (
         <IncomeEditor
           isOpen={!!selectedDay}
-          onClose={() => setSelectedDay(null)}
+          onClose={() => setSelectedDayStr(null)}
           date={selectedDay}
           sources={sources}
           onSave={() => setReloadKey(k => k + 1)}
-          existingIncomes={getIncomesByDay(selectedDay)}
+          existingIncomes={incomeDetailsMap[format(selectedDay, 'yyyy-MM-dd')] || []}
         />
       )}
     </>

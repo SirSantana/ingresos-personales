@@ -33,10 +33,8 @@ export default function DailyIncomePage() {
         amount: form[src.id] || 0, 
     //   user_id: user.id
     }))
-    console.log(records);
     
    const res = await supabase.from('daily_incomes').insert(records)
-    console.log(res)
 //     alert('Ingresos guardados')
   }
 
