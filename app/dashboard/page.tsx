@@ -16,30 +16,6 @@ export default function DashboardPage() {
   const [date, setDate] = useState(new Date())
   const [modeGlobal, setModeGlobal] = useState('month')
   const [incomeMonth, setIncomeMonth] = useState<number>(0)
-  // const [incomes, setIncomes] = useState<number>(0)
-  // useEffect(() => {
-  //   fetchIncomes()
-  // }, [date])
-  
-  // const fetchIncomes = async () => {
-  //   const startOfMonth = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-01`;
-  //   const startOfNextMonth = `${date.getFullYear()}-${(date.getMonth() + 2).toString().padStart(2, '0')}-01`;
-  
-  //   const { data, error } = await supabase
-  //     .from('daily_incomes')
-  //     .select('amount')
-  //     .filter('created_at', 'gte', startOfMonth)
-  //     .filter('created_at', 'lt', startOfNextMonth)
-  
-  //   if (error) {
-  //     console.error('Error fetching incomes:', error)
-  //   } else {
-  //     const totalIncome = data?.reduce((sum, row) => sum + row.amount, 0) || 0
-  //     setIncomes(totalIncome)
-  //   }
-  // }
-
-
   const [month, setMonth] = useState<number | null>(null)
   const [totalYear, setTotalYear] = useState<number>(0)
   
@@ -63,14 +39,13 @@ export default function DashboardPage() {
         <p className="text-gray-500 text-sm">Ingreso total del año:</p>
         <p className="text-3xl font-semibold text-green-600">${totalYear.toLocaleString()}</p>
       </div> */}
-      <GoToDailyRituals />
+      {/* <GoToDailyRituals /> */}
       <IncomeOverview totalIncome={modeGlobal === 'month' ? incomeMonth : totalYear} goal={modeGlobal==='month' ? 2500: 25000} modeGlobal={modeGlobal} />
       {modeGlobal === 'month' && (
         <MonthlyView selectedDate={date} year={year} month={date.getMonth() + 1} setIncomeMonth={setIncomeMonth} />
       )}
       {modeGlobal === 'year' &&  <IncomeReportChart />}
      
-
       {/* <YearlyIncomeView year={year} /> */}
       {/* IncomeTable opcional */}
       {/* {selectedDay && (

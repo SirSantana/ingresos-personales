@@ -1,188 +1,4 @@
-// 'use client'
 
-// import { useEffect, useState } from 'react'
-// import { supabase } from '@/lib/supabaseClient'
-// import { format } from 'date-fns'
-// import { motion } from 'framer-motion'
-
-// const rituals = [
-//   { key: 'agradecer', label: 'Agradecer por 3 cosas' },
-//   { key: 'visualizar', label: 'Visualizar tus metas' },
-//   { key: 'leer', label: 'Leer o escuchar algo inspirador' },
-//   { key: 'afirmaciones', label: 'Decir tus afirmaciones' },
-//   { key: 'registrar_ingresos', label: 'Registrar ingresos si los hay' }
-// ]
-
-// const moods = ['😄 Feliz', '😌 Tranquilo', '😔 Triste', '😕 Ansioso', '💪 Motivado', '😴 Cansado']
-
-// const affirmations = [
-//   'Soy capaz de crear valor y atraer abundancia.',
-//   'Cada día mejoro mis hábitos financieros.',
-//   'Soy disciplinado y merezco mis resultados.',
-//   'Estoy en paz con mi progreso y mi proceso.',
-//   'Mis pensamientos crean mi realidad.'
-// ]
-
-// export default function DailyRituals() {
-//   const [ritualsState, setRitualsState] = useState<any>({})
-//   const [loading, setLoading] = useState(true)
-//   const [gratitude, setGratitude] = useState('')
-//   const [savedGratitudes, setSavedGratitudes] = useState<string[]>([])
-//   const [currentRitualIndex, setCurrentRitualIndex] = useState(0)
-//   const today = format(new Date(), 'yyyy-MM-dd')
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       setLoading(true)
-
-//       // 1. Ritual del día
-//       const { data, error } = await supabase
-//         .from('daily_rituals')
-//         .select('*')
-//         .eq('date', today)
-//         .single()
-
-//       if (error) {
-//         const { data: newData } = await supabase
-//           .from('daily_rituals')
-//           .insert({ date: today })
-//           .select()
-//           .single()
-//         setRitualsState(newData || {})
-//       } else {
-//         setRitualsState(data || {})
-//       }
-
-//       // 2. Gratitudes anteriores desde localStorage
-//       const stored = JSON.parse(localStorage.getItem('gratitudes') || '[]')
-//       setSavedGratitudes(stored)
-
-//       setLoading(false)
-//     }
-
-//     fetchData()
-//   }, [today])
-
-//   const handleToggle = async (key: string) => {
-//     const updated = { ...ritualsState, [key]: !ritualsState[key] }
-//     setRitualsState(updated)
-//     await supabase.from('daily_rituals').update({ [key]: updated[key] }).eq('date', today)
-//   }
-
-//   const handleMoodChange = async (mood: string) => {
-//     const updated = { ...ritualsState, mood }
-//     setRitualsState(updated)
-//     await supabase.from('daily_rituals').update({ mood }).eq('date', today)
-//   }
-
-//   const handleSaveGratitude = () => {
-//     if (!gratitude.trim()) return
-//     const updated = [...savedGratitudes, gratitude]
-//     localStorage.setItem('gratitudes', JSON.stringify(updated))
-//     setSavedGratitudes(updated)
-//     setGratitude('')
-//   }
-
-//   const handleNextRitual = () => {
-//     if (currentRitualIndex < rituals.length - 1) {
-//       setCurrentRitualIndex(currentRitualIndex + 1)
-//     }
-//   }
-
-//   if (loading) return <p>Cargando ritual...</p>
-
-//   return (
-//     <div className="h-screen flex flex-col justify-between bg-white p-6">
-//       <motion.h2
-//         className="text-2xl font-bold text-center"
-//         initial={{ opacity: 0, y: -10 }}
-//         animate={{ opacity: 1, y: 0 }}
-//       >
-//         Buen día, Miguel 🌞<br />
-//         Hoy es {format(new Date(), 'eeee d MMMM', { locale: undefined })}
-//       </motion.h2>
-
-//       <p className="text-center text-gray-500 text-sm">
-//         Completaste {rituals.filter(r => ritualsState?.[r.key]).length} de {rituals.length} rituales hoy.
-//       </p>
-
-//       <div className="flex-grow space-y-6 overflow-y-auto">
-//         {currentRitualIndex < rituals.length && (
-//           <div>
-//             <h3 className="text-xl font-semibold text-center">{rituals[currentRitualIndex].label}</h3>
-//             <label className="flex items-center gap-3">
-//               <input
-//                 type="checkbox"
-//                 checked={!!ritualsState?.[rituals[currentRitualIndex].key]}
-//                 onChange={() => handleToggle(rituals[currentRitualIndex].key)}
-//                 className="w-5 h-5"
-//               />
-//               <span>{rituals[currentRitualIndex].label}</span>
-//             </label>
-//             <button
-//               onClick={handleNextRitual}
-//               className="w-full bg-blue-600 text-white py-3 rounded-xl mt-4 hover:bg-blue-700"
-//             >
-//               Siguiente Ritual
-//             </button>
-//           </div>
-//         )}
-
-//         {/* Otras secciones pueden ir aquí como Gratitud, Estado de Ánimo, Afirmaciones, etc. */}
-
-//         <div className="space-y-4">
-//           <label className="block font-semibold mb-1">¿Cómo te sientes hoy?</label>
-//           <select
-//             className="w-full border border-gray-300 rounded-xl p-2"
-//             value={ritualsState?.mood || ''}
-//             onChange={(e) => handleMoodChange(e.target.value)}
-//           >
-//             <option value="">Selecciona tu estado de ánimo</option>
-//             {moods.map(m => (
-//               <option key={m} value={m}>{m}</option>
-//             ))}
-//           </select>
-//         </div>
-
-//         <div>
-//           <label className="block font-semibold mb-1">Hoy agradezco por...</label>
-//           <textarea
-//             className="w-full border border-gray-300 rounded-xl p-2"
-//             value={gratitude}
-//             onChange={(e) => setGratitude(e.target.value)}
-//             rows={3}
-//           />
-//           <button
-//             onClick={handleSaveGratitude}
-//             className="mt-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm hover:bg-blue-700"
-//           >
-//             Guardar agradecimiento
-//           </button>
-//         </div>
-
-//         {savedGratitudes.length > 0 && (
-//           <div className="text-sm text-gray-500 italic">
-//             Agradecimiento pasado: “{savedGratitudes[Math.floor(Math.random() * savedGratitudes.length)]}”
-//           </div>
-//         )}
-
-//         <div className="bg-gray-100 p-4 rounded-xl">
-//           <h3 className="font-semibold mb-2">✨ Afirmación del día</h3>
-//           <p className="italic text-gray-700">
-//             {affirmations[Math.floor(Math.random() * affirmations.length)]}
-//           </p>
-//         </div>
-//       </div>
-
-//       <button
-//         onClick={() => alert('¡Comenzaste tu día con intención!')}
-//         className="w-full bg-green-600 text-white py-3 rounded-2xl font-semibold hover:bg-green-700 transition"
-//       >
-//         ✅ Comenzar mi día con intención
-//       </button>
-//     </div>
-//   )
-// }
 'use client'
 import { supabase } from '@/lib/supabaseClient'
 
@@ -190,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
+import AffirmationsModal from '../components/AfirmationsModal'
 
 // Simulación de supabase
 // const supabase = {
@@ -245,7 +62,8 @@ export default function DailyRituals() {
   const [showGratitudeModal, setShowGratitudeModal] = useState(false)
   const [selectedMood, setSelectedMood] = useState('')
   const [dailyAffirmation, setDailyAffirmation] = useState('')
-  
+  const [ showAffirmationsModal, setShowAffirmationsModal ] = useState(false)
+
   const today = format(new Date(), 'yyyy-MM-dd')
   const timeOfDay = (() => {
     const hour = new Date().getHours()
@@ -434,7 +252,7 @@ export default function DailyRituals() {
       </div>
 
       {/* Daily Affirmation */}
-      <div className="max-w-md mx-auto px-4 py-4">
+      <div onClick={() => setShowAffirmationsModal(true)} className="max-w-md mx-auto px-4 py-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -514,8 +332,10 @@ export default function DailyRituals() {
               ? '🎉 ¡Ritual completado!'
               : `✨ ${completedRituals}/${rituals.length} rituales completados`}
           </motion.button>
+          
         </div>
       </div>
+      {showAffirmationsModal && <AffirmationsModal onClose={() => setShowAffirmationsModal(false)} />}
     </div>
   )
 }

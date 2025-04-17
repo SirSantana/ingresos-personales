@@ -76,7 +76,7 @@ export default function MonthlyView({
 
   return (
     <>
-      <div className="p-6 max-w-7xl mx-auto">
+      <div className=" max-w-7xl mx-auto">
         <h2 className="text-3xl font-semibold text-gray-800 mb-2">
           Ingresos de {format(selectedDate, 'MMMM yyyy', { locale: es })}
         </h2>
