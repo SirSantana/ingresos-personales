@@ -13,6 +13,7 @@ import dynamic from 'next/dynamic'
 import { useIncomeByMonth } from '../hooks/useIncomeByMonth'
 import { Income } from '../types/income'
 import { sources } from './IncomeReportChart'
+import IncomeBySourceList from './IncomeBySourceList'
 
 // Lazy load del editor
 const IncomeEditor = dynamic(() => import('./IncomeEditor'), { ssr: false })
@@ -78,9 +79,14 @@ export default function MonthlyView({
     <>
       <div className=" max-w-7xl mx-auto">
         <h2 className="text-3xl font-semibold text-gray-800 mb-2">
-          Ingresos de {format(selectedDate, 'MMMM yyyy', { locale: es })}
+          Ingresos por Fuente
         </h2>
-
+        {incomes.length > 0 && (
+            <IncomeBySourceList 
+                incomesOfDay={incomes || []} // Pass the incomes array (optional)
+                sources={sources || []} // Pass the sources array (optional)
+            />
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {days.map((day) => {
             const key = format(day, 'yyyy-MM-dd')

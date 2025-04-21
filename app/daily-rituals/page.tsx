@@ -4,20 +4,71 @@ import { supabase } from '@/lib/supabaseClient'
 
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { format } from 'date-fns'
+import { format, getDaysInMonth, startOfMonth, getDay, addDays } from 'date-fns'
 import { es } from 'date-fns/locale'
 import AffirmationsModal from '../components/AfirmationsModal'
+import ProgressBarRituals from '../components/ProgressBarRituals'
 
-// Simulación de supabase
-// const supabase = {
-//   from: () => ({
-//     select: () => ({ eq: () => ({ single: () => Promise.resolve({ data: null, error: true }) }) }),
-//     insert: () => ({ select: () => ({ single: () => Promise.resolve({ data: {}, error: false }) }) }),
-//     update: () => ({ eq: () => Promise.resolve({ data: {}, error: false }) })
-//   })
-// }
 
-// Emojis para los rituales
+const MonthDays = () => {
+  const today = new Date()
+  const currentDate = today.getDate()
+  const daysInMonth = getDaysInMonth(today)
+  const firstDayOfMonth = startOfMonth(today)
+  const startDay = getDay(firstDayOfMonth) // 0 (Domingo) a 6 (Sábado)
+
+  // Días de la semana abreviados
+  const weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
+
+  // Generar los días del mes
+  const days = []
+  // Espacios vacíos para los primeros días que no son del mes
+  for (let i = 0; i < startDay; i++) {
+    days.push(null)
+  }
+
+  // Días del mes
+  for (let i = 1; i <= daysInMonth; i++) {
+    days.push(i)
+  }
+
+  return (
+    <div className="max-w-md mx-auto px-4 py-2">
+      <div className="bg-white rounded-2xl p-4 shadow-sm">
+        <div className="grid grid-cols-7 gap-1 text-center">
+          {/* Días de la semana */}
+          {weekDays.map((day) => (
+            <div key={day} className="text-xs font-medium text-gray-500 py-1">
+              {day}
+            </div>
+          ))}
+
+          {/* Días del mes */}
+          {days.map((day, index) => (
+            <div
+              key={index}
+              className={`py-2 rounded-full ${day === currentDate ? 'bg-indigo-100 font-bold' : ''}`}
+            >
+              {day ? (
+                <>
+                  <div className="text-sm">{day}</div>
+                  {day === 11 && <div className="text-[10px] text-gray-500">Mon</div>}
+                  {day === 12 && <div className="text-[10px] text-gray-500">Tue</div>}
+                  {day === 13 && <div className="text-[10px] text-gray-500">Wed</div>}
+                  {day === 14 && <div className="text-[10px] text-gray-500">Thu</div>}
+                  {day === 15 && <div className="text-[10px] text-gray-500">Fri</div>}
+                </>
+              ) : (
+                <div className="h-4"></div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const ritualEmojis = {
   agradecer: '🙏',
   visualizar: '🎯',
@@ -62,7 +113,7 @@ export default function DailyRituals() {
   const [showGratitudeModal, setShowGratitudeModal] = useState(false)
   const [selectedMood, setSelectedMood] = useState('')
   const [dailyAffirmation, setDailyAffirmation] = useState('')
-  const [ showAffirmationsModal, setShowAffirmationsModal ] = useState(false)
+  const [showAffirmationsModal, setShowAffirmationsModal] = useState(false)
 
   const today = format(new Date(), 'yyyy-MM-dd')
   const timeOfDay = (() => {
@@ -94,11 +145,11 @@ export default function DailyRituals() {
 
       const stored = JSON.parse(localStorage.getItem('gratitudes') || '[]')
       setSavedGratitudes(stored)
-      
+
       // Selección de afirmación del día
       const affirmationIndex = new Date().getDate() % affirmations.length
       setDailyAffirmation(affirmations[affirmationIndex])
-      
+
       setLoading(false)
     }
 
@@ -109,7 +160,7 @@ export default function DailyRituals() {
     const updated = { ...ritualsState, [key]: !ritualsState[key] }
     setRitualsState(updated)
     await supabase.from('daily_rituals').update({ [key]: updated[key] }).eq('date', today)
-    
+
     // Abrir modal de gratitud si se selecciona el ritual de agradecer
     if (key === 'agradecer' && !ritualsState[key]) {
       setShowGratitudeModal(true)
@@ -150,82 +201,107 @@ export default function DailyRituals() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 pb-20">
       {/* Header */}
-      <div className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-md mx-auto px-4 py-4">
+      <header className="bg-white shadow-sm sticky top-0 z-10 border-b border-gray-100"> {/* Subtle shadow and border */}
+        <div className="max-w-screen-xl mx-auto px-4 py-3 flex justify-between items-center"> {/* Flex layout */}
+
+          {/* Left Icon - Placeholder for Grid */}
+          <div className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 cursor-pointer hover:border-gray-400 transition-colors duration-200">
+            {/* Example Grid Icon SVG (from Heroicons) */}
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2h-2zM11 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z" />
+            </svg>
+          </div>
+
+          {/* Center Text: Date & Name */}
+          {/* Note: The image shows Date then Name, reversing your original order */}
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center"
+            transition={{ duration: 0.3 }}
+            className="text-center flex-grow px-2" // Centered text block, allow it to grow
           >
-            <h1 className="text-2xl font-bold text-gray-800">{timeOfDay}, Miguel</h1>
-            <p className="text-sm text-gray-500 mt-1">
-              {format(new Date(), "EEEE, d 'de' MMMM", { locale: es })}
+            {/* Date - Primary text */}
+            <p className="text-base sm:text-lg font-semibold text-gray-800">
+              {/* Format date like the image: Day, DD Mon YY (using es locale) */}
+              {format(new Date(), "EEEE, dd MMM yy", { locale: es })}
+            </p>
+            {/* Name - Secondary text */}
+            {/* Using 'Miguel' from your original code */}
+            <p className="text-sm text-gray-500 mt-0.5">
+              Miguel
             </p>
           </motion.div>
-        </div>
-      </div>
 
-      {/* Progress Bar */}
-      <div className="max-w-md mx-auto px-4 py-4">
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-600">Progreso del día</span>
-            <span className="text-sm font-bold text-indigo-600">{Math.round(progress)}%</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2.5">
-            <motion.div
-              className="bg-indigo-600 h-2.5 rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.5 }}
-            />
+          {/* Right Icon - Placeholder for Notification Bell */}
+          <div className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 cursor-pointer hover:border-gray-400 transition-colors duration-200">
+            {/* Example Bell Icon SVG (from Heroicons) */}
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 2a6 6 0 00-6 6v3.586l1.707 1.707A.5.5 0 018 14h4a.5.5 0 01.354-.146L16 11.586V8a6 6 0 00-6-6zm0 16a2 2 0 100-4 2 2 0 000 4z" />
+            </svg>
           </div>
         </div>
-      </div>
+      </header>
+      {/* <MonthDays /> */}
+
+      {/* Progress Bar Section */}
+      <ProgressBarRituals progress={progress} />
 
       {/* Rituals Grid */}
-      <div className="max-w-md mx-auto px-4 py-4">
-        <div className="grid grid-cols-2 gap-4">
+      <div className="max-w-md mx-auto px-4 py-6"> {/* Ajuste de padding vertical */}
+        <div className="grid grid-cols-1 gap-4 sm:gap-5"> {/* Ajuste de espacio entre elementos */}
           {rituals.map((ritual) => (
             <motion.div
               key={ritual.key}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className={`${
-                ritualsState[ritual.key] ? 'bg-indigo-100 border-indigo-300' : 'bg-white'
-              } rounded-2xl p-4 border border-gray-200 shadow-sm cursor-pointer transition-colors`}
+              whileHover={{ scale: 1.02, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)" }} // Sombra más pronunciada al pasar el ratón
+              whileTap={{ scale: 0.98 }} // Efecto de escala al hacer clic
+              // Estilos condicionales para el estado completado
+              className={`${ritualsState[ritual.key]
+                  ? 'bg-gradient-to-r from-indigo-50 to-blue-50 border-indigo-400 shadow-md' // Fondo degradado claro, borde más fuerte, sombra media
+                  : 'bg-white border-gray-200 shadow-sm' // Fondo blanco por defecto, borde sutil, sombra ligera
+                } rounded-xl p-5 border cursor-pointer transition-all duration-200 ease-in-out transform`} // Bordes redondeados, padding, borde, cursor, transición y transform
               onClick={() => handleToggle(ritual.key)}
             >
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{ritualEmojis[ritual.key as keyof typeof ritualEmojis]}</span>
-                <div>
-                  <h3 className="font-semibold text-gray-800">{ritual.label}</h3>
-                  <p className="text-xs text-gray-500 mt-1">{ritual.description}</p>
+              <div className="flex items-center justify-between gap-4"> {/* Contenedor flexible para emoji, texto y estado */}
+
+                {/* Emoji */}
+                <span className="text-3xl flex-shrink-0">{ritualEmojis[ritual.key as keyof typeof ritualEmojis]}</span> {/* Emoji más grande, no se encoge */}
+
+                {/* Texto: Etiqueta y Descripción */}
+                <div className="flex-grow pr-4"> {/* Permite que el bloque de texto crezca, añade padding a la derecha */}
+                  <h3 className={`font-semibold text-gray-800 text-base sm:text-lg ${ritualsState[ritual.key] ? 'text-indigo-800' : ''}`}> {/* Etiqueta más grande, color cambia al completar */}
+                    {ritual.label}
+                  </h3>
+                  <p className={`text-sm text-gray-600 mt-1 ${ritualsState[ritual.key] ? 'text-indigo-700' : ''}`}> {/* Descripción ligeramente más grande, color cambia al completar */}
+                    {ritual.description}
+                  </p>
                 </div>
-              </div>
-              <div className="mt-4 flex justify-end">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                  ritualsState[ritual.key] ? 'bg-indigo-600' : 'bg-gray-200'
-                }`}>
+
+                {/* Indicador de Estado (Checkbox) */}
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${ // Tamaño fijo, no se encoge
+                  ritualsState[ritual.key]
+                    ? 'bg-indigo-600 border-indigo-600' // Fondo sólido y borde del mismo color al completar
+                    : 'bg-gray-300 border-gray-300' // Fondo y borde gris por defecto
+                  } border-2 transition-colors duration-200`}> {/* Borde de 2px, transición de colores */}
                   {ritualsState[ritual.key] && (
                     <motion.svg
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
+                      initial={{ scale: 0.5, opacity: 0 }} // Empieza más pequeño e invisible
+                      animate={{ scale: 1, opacity: 1 }} // Anima a tamaño completo y visible
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }} // Animación tipo "spring"
                       className="w-4 h-4 text-white"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /> {/* Trazo del checkmark más grueso */}
                     </motion.svg>
                   )}
                 </div>
               </div>
+              {/* Se eliminó el div antiguo del checkbox en la parte inferior */}
             </motion.div>
           ))}
         </div>
       </div>
-
       {/* Mood Section */}
       <div className="max-w-md mx-auto px-4 py-4">
         <div className="bg-white rounded-2xl p-4 shadow-sm">
@@ -236,11 +312,10 @@ export default function DailyRituals() {
                 key={mood}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`p-3 rounded-xl cursor-pointer text-center ${
-                  selectedMood === mood
+                className={`p-3 rounded-xl cursor-pointer text-center ${selectedMood === mood
                     ? `${data.color} text-white`
                     : 'bg-gray-100 text-gray-800'
-                }`}
+                  }`}
                 onClick={() => handleMoodChange(mood)}
               >
                 <span className="text-2xl block mb-1">{data.icon}</span>
@@ -305,7 +380,7 @@ export default function DailyRituals() {
                   Guardar
                 </button>
               </div>
-              
+
               {savedGratitudes.length > 0 && (
                 <div className="mt-6 border-t pt-4">
                   <h4 className="text-sm font-medium text-gray-600 mb-2">Agradecimientos anteriores</h4>
@@ -332,7 +407,7 @@ export default function DailyRituals() {
               ? '🎉 ¡Ritual completado!'
               : `✨ ${completedRituals}/${rituals.length} rituales completados`}
           </motion.button>
-          
+
         </div>
       </div>
       {showAffirmationsModal && <AffirmationsModal onClose={() => setShowAffirmationsModal(false)} />}

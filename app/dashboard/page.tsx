@@ -6,11 +6,10 @@ import Header from "../components/HeaderDashboard"
 import IncomeOverview from "../components/IncomeOverview"
 import { supabase } from "@/lib/supabaseClient"
 import MonthlyView from "../components/MonthlyView"
-import IncomeEditor from "../components/IncomeEditor"
-import { useIncomeByMonth } from "../hooks/useIncomeByMonth"
-import YearlyIncomeView from "../components/YearlyIncomeView"
 import IncomeReportChart from "../components/IncomeReportChart"
-import GoToDailyRituals from "../components/GoToDailyRituals"
+import ProgressBarRituals from "../components/ProgressBarRituals"
+import IncomeStatisticsCard from "../components/IncomeStadisticsCard"
+
 
 export default function DashboardPage() {
   const [date, setDate] = useState(new Date())
@@ -35,31 +34,18 @@ export default function DashboardPage() {
   return (
     <DashboardLayout>
       <Header setModeGlobal={setModeGlobal} selectedDate={date} onChange={setDate} />
-      {/* <div>
-        <p className="text-gray-500 text-sm">Ingreso total del año:</p>
-        <p className="text-3xl font-semibold text-green-600">${totalYear.toLocaleString()}</p>
-      </div> */}
-      {/* <GoToDailyRituals /> */}
+    
       <IncomeOverview totalIncome={modeGlobal === 'month' ? incomeMonth : totalYear} goal={modeGlobal==='month' ? 2500: 25000} modeGlobal={modeGlobal} />
+      <IncomeStatisticsCard totalIncome={modeGlobal === 'month' ? incomeMonth : totalYear} lastMonthIncome={incomeMonth} />
+      <ProgressBarRituals progress={40} />
+      
       {modeGlobal === 'month' && (
         <MonthlyView selectedDate={date} year={year} month={date.getMonth() + 1} setIncomeMonth={setIncomeMonth} />
       )}
       {modeGlobal === 'year' &&  <IncomeReportChart />}
      
-      {/* <YearlyIncomeView year={year} /> */}
       {/* IncomeTable opcional */}
-      {/* {selectedDay && (
-        <IncomeEditor
-          isOpen={!!selectedDay}
-          onClose={() => setSelectedDay(null)}
-          date={selectedDay}
-          sources={sources}
-          onSave={() => {
-            fetchIncomes()
-            refreshMonthlyView()
-          }}
-        />
-      )} */}
+     
     </DashboardLayout>
   )
 }
