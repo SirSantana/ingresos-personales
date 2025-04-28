@@ -22,6 +22,7 @@ import {
 import { format, addDays, addWeeks, differenceInWeeks } from 'date-fns'
 import { es } from 'date-fns/locale'
 import UpdateProgressModal from './UpdateProgressModal'
+import Link from 'next/link'
 
 type WeeklyGoal = {
   id: string
@@ -268,6 +269,7 @@ export default function CycleDetail() {
 
                 return (
                   <div
+                  onClick={() => router.push(`/ciclos/${cycleId}/week/${week}`)}
                     key={week}
                     className={`bg-white border rounded-lg shadow-md p-5 flex flex-col ${isCurrentWeek ? 'ring-2 ring-amber-500 ring-offset-2' : ''
                       }`}
@@ -324,11 +326,15 @@ export default function CycleDetail() {
                                 )}
 
                                 <button
-                                  onClick={() => openProgressModal(g)}
+                                   onClick={(e) => {
+                                    e.stopPropagation() // ⛔ evita que el clic suba al Link
+                                    openProgressModal(g)
+                                  }}
                                   className="mt-2 text-xs text-blue-600 hover:text-blue-700 underline flex items-center gap-1"
                                 >
                                   <PencilLine className="h-3 w-3" /> Actualizar progreso
                                 </button>
+                                
                               </div>
                             )
                           })}
@@ -342,7 +348,10 @@ export default function CycleDetail() {
                     </div>
 
                     <button
-                      onClick={() => openModalForWeek(week)}
+                     onClick={(e) => {
+                      e.stopPropagation() // ⛔ evita que el clic suba al Link
+                      openModalForWeek(week)
+                    }}
                       className="mt-4 text-blue-700 hover:text-blue-800 text-sm flex items-center justify-center py-2 px-3 border border-blue-200 rounded-md hover:bg-blue-50 transition font-medium shadow-sm hover:shadow"
                     >
                       <PlusCircle className="h-4 w-4 mr-1.5" />
