@@ -366,11 +366,12 @@ export default function ComponentDashboard() {
             <motion.button
               className="flex flex-col items-center"
               whileTap={{ scale: 0.9 }}
+              onClick={() => router.push('expenses')}
             >
               <div className="p-2 bg-blue-50 rounded-xl">
                 <Home size={20} className="text-blue-600" />
               </div>
-              <span className="text-xs font-medium text-blue-600 mt-1">Inicio</span>
+              <span className="text-xs font-medium text-blue-600 mt-1">Gastos</span>
             </motion.button>
 
             <motion.button
