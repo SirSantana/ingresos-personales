@@ -42,7 +42,7 @@ export const sources = [
   },
   {
     id: '9eed0052-01c2-4f7a-aa09-1c082c79b5d9',
-    name: 'Trading ',
+    name: 'Trading',
     logo: '/logos/trading.webp'
   }
 ]
