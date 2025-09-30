@@ -39,6 +39,11 @@ export const sources = [
     id: '8efd713b-5778-440d-b9d0-e16e0a566390',
     name: 'Mercado Libre',
     logo: '/logos/mercado-libre.png'
+  },
+  {
+    id: '9eed0052-01c2-4f7a-aa09-1c082c79b5d9',
+    name: 'Trading ',
+    logo: '/logos/trading.webp'
   }
 ]
 
