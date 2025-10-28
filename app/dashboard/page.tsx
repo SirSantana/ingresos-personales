@@ -13,7 +13,7 @@ import IncomeStatisticsCard from "../components/IncomeStadisticsCard"
 
 export default function DashboardPage() {
   const [date, setDate] = useState(new Date())
-  const [modeGlobal, setModeGlobal] = useState('month')
+  const [modeGlobal, setModeGlobal] = useState<'month' | 'year'>('month')
   const [incomeMonth, setIncomeMonth] = useState<number>(0)
   const [month, setMonth] = useState<number | null>(null)
   const [totalYear, setTotalYear] = useState<number>(0)
