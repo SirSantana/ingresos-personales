@@ -1,8 +1,5 @@
-'use client'
-
-import React, { useMemo } from 'react'
-import Image from 'next/image'
-import { TrendingUp, Zap } from 'lucide-react'
+import { useMemo } from 'react'
+import { TrendingUp, Award } from 'lucide-react'
 
 interface Income {
   amount: number
@@ -39,8 +36,16 @@ const cleanSourceName = (name: string): string => {
 }
 
 export default function IncomeBySourceList({
-  incomesOfDay = [],
-  sources = [],
+  incomesOfDay = [
+    { amount: 15000, created_at: '2024-01-01', source_id: '1' },
+    { amount: 8000, created_at: '2024-01-01', source_id: '2' },
+    { amount: 5000, created_at: '2024-01-01', source_id: '3' },
+  ],
+  sources = [
+    { id: '1', name: 'YouTube Principal', logo: '' },
+    { id: '2', name: 'TikTok Creator', logo: '' },
+    { id: '3', name: 'Facebook Ads', logo: '' },
+  ],
   date
 }: IncomeBySourceListProps) {
 
@@ -85,139 +90,109 @@ export default function IncomeBySourceList({
     : 0
 
   return (
-    <div className="space-y-6">
-      
-      {/* Summary Stats */}
-      {incomeEntries.length > 0 && (
-        <div className="flex items-center justify-between p-4 bg-white/60 backdrop-blur rounded-2xl border border-white/80">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-indigo-100 rounded-xl">
-              <TrendingUp className="w-5 h-5 text-indigo-600" />
-            </div>
-            <div>
-              <p className="text-xs text-gray-600 font-medium">Total de Fuentes Activas</p>
-              <p className="text-lg font-bold text-gray-900">{incomeEntries.length}</p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-xs text-gray-600 font-medium">Fuente Principal</p>
-            <p className="text-lg font-bold text-indigo-600">
-              {topSourcePercentage.toFixed(0)}%
-            </p>
-          </div>
+    <div className="min-h-screen w-full flex items-center justify-center px-6 py-12">
+      <div className="w-full max-w-6xl">
+        
+        {/* Title */}
+        <div className="text-center mb-20">
+          <h2 className="text-3xl font-light text-gray-900 tracking-wide">
+            Fuentes de Ingresos
+          </h2>
         </div>
-      )}
 
-      {/* Horizontal Scrollable List */}
-      {incomeEntries.length > 0 ? (
-        <div className="relative">
-          {/* Fade edges */}
-          <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-purple-50 to-transparent z-10 pointer-events-none"></div>
-          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-pink-50 to-transparent z-10 pointer-events-none"></div>
-          
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-indigo-200 scrollbar-track-transparent px-1">
-            {incomeEntries.map(({ source, amount }, index) => {
-              const sourceDisplayName = cleanSourceName(source.name)
-              const percentage = dailyTotal > 0 ? (amount / dailyTotal) * 100 : 0
-              const isTopSource = index === 0
+        {incomeEntries.length > 0 ? (
+          <>
+            {/* Summary */}
+            <div className="flex items-center justify-center gap-16 mb-24">
+              <div className="text-center">
+                <p className="text-sm font-normal text-gray-400 mb-3 tracking-wide">
+                  Fuentes Activas
+                </p>
+                <p className="text-5xl font-light text-gray-900">
+                  {incomeEntries.length}
+                </p>
+              </div>
+              
+              <div className="w-px h-16 bg-gray-200"></div>
+              
+              <div className="text-center">
+                <p className="text-sm font-normal text-gray-400 mb-3 tracking-wide">
+                  Principal
+                </p>
+                <p className="text-5xl font-light text-gray-900">
+                  {topSourcePercentage.toFixed(0)}%
+                </p>
+              </div>
+            </div>
 
-              return (
-                <div
-                  key={source.id}
-                  className={`group relative flex flex-col bg-white rounded-2xl shadow-sm border-2 transition-all duration-300 flex-shrink-0 w-56 hover:shadow-xl hover:-translate-y-1 ${
-                    isTopSource 
-                      ? 'border-indigo-300 ring-2 ring-indigo-100' 
-                      : 'border-gray-200 hover:border-indigo-200'
-                  }`}
-                >
-                  {/* Top Badge for #1 */}
-                  {isTopSource && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                      <div className="flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-                        <Zap className="w-3 h-3" />
-                        Top 1
-                      </div>
+            {/* Sources Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+              {incomeEntries.map(({ source, amount }, index) => {
+                const sourceDisplayName = cleanSourceName(source.name)
+                const percentage = dailyTotal > 0 ? (amount / dailyTotal) * 100 : 0
+                const isTopSource = index === 0
+
+                return (
+                  <div key={source.id} className="text-center">
+                    {/* Logo/Icon */}
+                    <div className="inline-flex items-center justify-center w-16 h-16 mb-6">
+                      {source.logo && typeof source.logo === 'string' ? (
+                        <img
+                          src={source.logo}
+                          alt={`${source.name} logo`}
+                          className="w-12 h-12 object-contain opacity-40"
+                        />
+                      ) : (
+                        <span className="text-3xl font-light text-gray-300">
+                          {source.name ? source.name.charAt(0).toUpperCase() : '?'}
+                        </span>
+                      )}
                     </div>
-                  )}
 
-                  <div className="p-5">
-                    {/* Source Logo & Name */}
-                    <div className="flex flex-col items-center mb-4 mt-2">
-                      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-3 transition-transform group-hover:scale-110 ${
-                        isTopSource ? 'bg-gradient-to-br from-indigo-100 to-purple-100' : 'bg-gray-100'
-                      }`}>
-                        {source.logo && typeof source.logo === 'string' ? (
-                          <Image
-                            src={source.logo}
-                            alt={`${source.name} logo`}
-                            width={40}
-                            height={40}
-                            className="object-contain"
-                          />
-                        ) : (
-                          <span className="text-2xl font-bold text-gray-500">
-                            {source.name ? source.name.charAt(0).toUpperCase() : '?'}
-                          </span>
-                        )}
-                      </div>
-                      
-                      <h3 className="font-bold text-gray-800 text-sm text-center line-clamp-2 h-10">
+                    {/* Source Name with Badge */}
+                    <div className="flex items-center justify-center gap-2 mb-3">
+                      <h3 className="text-lg font-normal text-gray-600">
                         {sourceDisplayName || 'Fuente'}
                       </h3>
+                      {isTopSource && (
+                        <Award className="w-5 h-5 text-gray-400" strokeWidth={1.5} />
+                      )}
                     </div>
 
-                    {/* Income Amount */}
-                    <div className="space-y-2">
-                      <div className={`p-3 rounded-xl text-center ${
-                        isTopSource 
-                          ? 'bg-gradient-to-br from-indigo-50 to-purple-50' 
-                          : 'bg-gray-50'
-                      }`}>
-                        <p className="text-xs text-gray-600 font-medium mb-1">Ingresos</p>
-                        <p className={`text-2xl font-bold ${
-                          isTopSource ? 'text-indigo-600' : 'text-gray-900'
-                        }`}>
-                          {formatCurrency(amount)}
-                        </p>
-                      </div>
+                    {/* Amount */}
+                    <p className="text-4xl lg:text-5xl font-light text-gray-900 mb-3 tracking-tight">
+                      {formatCurrency(amount)}
+                    </p>
 
-                      {/* Percentage Bar */}
-                      <div className="space-y-1">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-500 font-medium">Participación</span>
-                          <span className="text-xs font-bold text-gray-700">{percentage.toFixed(1)}%</span>
-                        </div>
-                        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              isTopSource 
-                                ? 'bg-gradient-to-r from-indigo-500 to-purple-500' 
-                                : 'bg-gradient-to-r from-blue-400 to-blue-500'
-                            }`}
-                            style={{ width: `${percentage}%` }}
-                          ></div>
-                        </div>
-                      </div>
+                    {/* Percentage */}
+                    <p className="text-sm font-normal text-gray-400">
+                      {percentage.toFixed(1)}%
+                    </p>
+
+                    {/* Progress Bar */}
+                    <div className="w-full max-w-xs mx-auto h-px bg-gray-200 mt-6">
+                      <div
+                        className="h-full bg-gray-900 transition-all duration-1000"
+                        style={{ width: `${percentage}%` }}
+                      ></div>
                     </div>
                   </div>
-
-                  {/* Hover Gradient Overlay */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/5 group-hover:to-purple-500/5 pointer-events-none transition-all duration-300"></div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-24">
+            <div className="inline-flex items-center justify-center w-20 h-20 mb-8">
+              <TrendingUp className="w-12 h-12 text-gray-300" strokeWidth={1.5} />
+            </div>
+            <p className="text-lg font-normal text-gray-400">
+              No hay registros de ingresos para este período
+            </p>
           </div>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center py-12 px-4">
-          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-            <TrendingUp className="w-10 h-10 text-gray-300" />
-          </div>
-          <p className="text-gray-500 text-sm font-medium text-center">
-            No hay registros de ingresos para este período
-          </p>
-        </div>
-      )}
+        )}
+        
+      </div>
     </div>
   )
 }

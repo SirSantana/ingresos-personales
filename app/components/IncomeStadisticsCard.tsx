@@ -1,8 +1,5 @@
-'use client'
-
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, TrendingUp, TrendingDown, Calendar, DollarSign, Target } from 'lucide-react'
+import { TrendingUp, TrendingDown, Calendar, DollarSign, Target } from 'lucide-react'
 
 // Helper to get days in a month
 const getDaysInMonth = (year: number, month: number) => {
@@ -33,11 +30,9 @@ interface IncomeStatisticsCardProps {
 
 export default function IncomeStatisticsCard({ 
   totalIncome, 
-  lastMonthIncome, 
+  lastMonthIncome = 18000, 
   periodName = 'este mes' 
 }: IncomeStatisticsCardProps) {
-  const [isExpanded, setIsExpanded] = useState(true)
-
   const now = new Date()
   const currentYear = now.getFullYear()
   const currentMonth = now.getMonth()
@@ -63,144 +58,92 @@ export default function IncomeStatisticsCard({
   const stats = [
     {
       icon: DollarSign,
-      label: `Promedio Diario (${periodName})`,
+      label: 'Promedio Diario',
       value: formatCurrency(averageDailyIncome),
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+    },
+    {
+      icon: Target,
+      label: 'Proyección de Cierre',
+      value: projectedIncome !== null ? formatCurrency(projectedIncome) : 'N/A',
     },
     {
       icon: Calendar,
       label: 'Días Transcurridos',
       value: `${daysPassed} de ${totalDaysInPeriod}`,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
-    },
-    {
-      icon: Target,
-      label: 'Días Restantes',
-      value: daysRemaining >= 0 ? daysRemaining.toString() : '0',
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-    },
-    {
-      icon: TrendingUp,
-      label: `Proyección Fin ${periodName}`,
-      value: projectedIncome !== null ? formatCurrency(projectedIncome) : 'N/A',
-      color: 'text-emerald-600',
-      bgColor: 'bg-emerald-50',
     },
   ]
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden"
-    >
-      {/* Card Header */}
-      <div
-        className="flex justify-between items-center p-6 cursor-pointer hover:bg-gray-50/50 transition-colors border-b border-gray-100"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl">
-            <TrendingUp className="w-5 h-5 text-blue-600" />
-          </div>
-          <h2 className="text-xl font-bold text-gray-900">Estadísticas de Ingresos</h2>
-        </div>
+    <div className="min-h-screen w-full flex items-center justify-center px-6 py-12">
+      <div className="w-full max-w-5xl">
         
-        <motion.div
-          animate={{ rotate: isExpanded ? 180 : 0 }}
-          transition={{ duration: 0.3 }}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <ChevronDown className="w-5 h-5 text-gray-500" />
-        </motion.div>
-      </div>
+        {/* Title */}
+        <div className="text-center mb-20">
+          <h2 className="text-3xl font-light text-gray-900 tracking-wide">
+            Estadísticas
+          </h2>
+        </div>
 
-      {/* Collapsible Content */}
-      <AnimatePresence initial={false}>
-        {isExpanded && (
-          <motion.div
-            key="stats-content"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-          >
-            <div className="p-6 space-y-6">
-              
-              {/* Comparison with Last Month */}
-              {percentageChange !== null && lastMonthIncome !== undefined && (
-                <div className="p-5 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl border border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600 font-medium mb-2">
-                        vs. Mes Anterior
-                      </p>
-                      <p className="text-2xl font-bold text-gray-900 mb-1">
-                        {formatCurrency(lastMonthIncome)}
-                      </p>
-                      <div className={`flex items-center gap-2 ${isPositiveChange ? 'text-emerald-600' : 'text-red-600'}`}>
-                        {isPositiveChange ? (
-                          <TrendingUp className="w-4 h-4" />
-                        ) : (
-                          <TrendingDown className="w-4 h-4" />
-                        )}
-                        <span className="text-sm font-bold">
-                          {isPositiveChange ? '+' : ''}{percentageChange.toFixed(1)}%
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          ({isPositiveChange ? '+' : ''}{formatCurrency(incomeChangeFromLastMonth)})
-                        </span>
-                      </div>
-                    </div>
-                    <div className={`p-4 rounded-full ${isPositiveChange ? 'bg-emerald-100' : 'bg-red-100'}`}>
-                      {isPositiveChange ? (
-                        <TrendingUp className={`w-8 h-8 ${isPositiveChange ? 'text-emerald-600' : 'text-red-600'}`} />
-                      ) : (
-                        <TrendingDown className="w-8 h-8 text-red-600" />
-                      )}
-                    </div>
-                  </div>
+        {/* Main Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 mb-24">
+          {stats.map((stat, index) => {
+            const Icon = stat.icon
+            return (
+              <div key={index} className="text-center">
+                <div className="inline-flex items-center justify-center w-14 h-14 mb-6">
+                  <Icon className="w-8 h-8 text-gray-400" strokeWidth={1.5} />
                 </div>
-              )}
-
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-4">
-                {stats.map((stat, index) => {
-                  const Icon = stat.icon
-                  return (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="p-5 bg-white border border-gray-200 rounded-2xl hover:shadow-md transition-all duration-300 group"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className={`p-2.5 ${stat.bgColor} rounded-xl group-hover:scale-110 transition-transform`}>
-                          <Icon className={`w-5 h-5 ${stat.color}`} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-gray-600 font-medium mb-1.5 leading-tight">
-                            {stat.label}
-                          </p>
-                          <p className="text-lg font-bold text-gray-900 truncate">
-                            {stat.value}
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )
-                })}
+                <p className="text-sm font-normal text-gray-400 mb-3 tracking-wide">
+                  {stat.label}
+                </p>
+                <p className="text-4xl lg:text-5xl font-light text-gray-900 tracking-tight">
+                  {stat.value}
+                </p>
               </div>
+            )
+          })}
+        </div>
+
+        {/* Comparison Section */}
+        {percentageChange !== null && lastMonthIncome !== undefined && (
+          <div className="max-w-2xl mx-auto">
+            <div className="text-center mb-12">
+              <p className="text-sm font-normal text-gray-400 mb-2 tracking-wide">
+                vs. Mes Anterior
+              </p>
+              <p className="text-5xl lg:text-6xl font-light text-gray-900 mb-6 tracking-tight">
+                {formatCurrency(lastMonthIncome)}
+              </p>
+              
+              <div className="inline-flex items-center gap-3">
+                {isPositiveChange ? (
+                  <TrendingUp className="w-6 h-6 text-green-500" strokeWidth={1.5} />
+                ) : (
+                  <TrendingDown className="w-6 h-6 text-red-500" strokeWidth={1.5} />
+                )}
+                <span className={`text-2xl font-light ${isPositiveChange ? 'text-green-500' : 'text-red-500'}`}>
+                  {isPositiveChange ? '+' : ''}{percentageChange.toFixed(1)}%
+                </span>
+              </div>
+              
+              <p className="text-sm font-normal text-gray-400 mt-4">
+                {isPositiveChange ? '+' : ''}{formatCurrency(incomeChangeFromLastMonth)}
+              </p>
             </div>
-          </motion.div>
+
+            {/* Visual indicator line */}
+            <div className="relative w-full h-px bg-gray-200 my-12">
+              <div 
+                className={`absolute top-0 left-0 h-full transition-all duration-1000 ${
+                  isPositiveChange ? 'bg-green-500' : 'bg-red-500'
+                }`}
+                style={{ width: `${Math.min(Math.abs(percentageChange), 100)}%` }}
+              />
+            </div>
+          </div>
         )}
-      </AnimatePresence>
-    </motion.div>
+        
+      </div>
+    </div>
   )
 }

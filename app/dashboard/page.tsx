@@ -37,7 +37,7 @@ export default function DashboardPage() {
     
       <IncomeOverview totalIncome={modeGlobal === 'month' ? incomeMonth : totalYear} goal={modeGlobal==='month' ? 2500: 25000} modeGlobal={modeGlobal} />
       <IncomeStatisticsCard totalIncome={modeGlobal === 'month' ? incomeMonth : totalYear} lastMonthIncome={incomeMonth} />
-      <ProgressBarRituals progress={40} />
+      {/* <ProgressBarRituals progress={40} /> */}
       
       {modeGlobal === 'month' && (
         <MonthlyView selectedDate={date} year={year} month={date.getMonth() + 1} setIncomeMonth={setIncomeMonth} />

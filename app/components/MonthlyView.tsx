@@ -85,152 +85,259 @@ export default function MonthlyView({
         
         {/* Income by Source Section */}
         {incomes.length > 0 && (
-          <div className="mb-12 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-3xl p-8 shadow-sm border border-indigo-100/50">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2.5 bg-white rounded-xl shadow-sm">
-                <Sparkles className="w-5 h-5 text-indigo-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Ingresos por Fuente
-              </h2>
-            </div>
-            <IncomeBySourceList 
-              incomesOfDay={incomes || []}
-              sources={sources || []}
-            />
-          </div>
-        )}
+  <div className="mb-20">
+    <IncomeBySourceList 
+      incomesOfDay={incomes || []}
+      sources={sources || []}
+    />
+  </div>
+)}
 
         {/* Daily Income Grid */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <span>Registro Diario</span>
-            <span className="text-sm font-normal text-gray-500">
-              {format(selectedDate, 'MMMM yyyy', { locale: es })}
-            </span>
-          </h2>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-4">
-            {days.map((day) => {
-              const key = format(day, 'yyyy-MM-dd')
-              const total = incomeMap[key] || 0
-              const incomesOfDay = incomeDetailsMap[key] || []
-              const hasIncome = total > 0
-              const isToday = format(new Date(), 'yyyy-MM-dd') === key
+  <div className="text-center mb-20">
+    <h2 className="text-3xl font-light text-gray-900 tracking-wide mb-2">
+      {format(selectedDate, 'MMMM yyyy', { locale: es })}
+    </h2>
+    <p className="text-sm font-normal text-gray-400">
+      Registro diario de ingresos
+    </p>
+  </div>
+  
+  {/* Mobile: Horizontal Slider */}
+  <div className="lg:hidden overflow-x-auto -mx-6 px-6 pb-4">
+    <div className="flex gap-4" style={{ scrollSnapType: 'x mandatory' }}>
+      {days.map((day) => {
+        const key = format(day, 'yyyy-MM-dd')
+        const total = incomeMap[key] || 0
+        const incomesOfDay = incomeDetailsMap[key] || []
+        const hasIncome = total > 0
+        const isToday = format(new Date(), 'yyyy-MM-dd') === key
 
-              const bySource: Record<string, number> = {}
-              incomesOfDay.forEach((inc) => {
-                if (!bySource[inc.source_id]) bySource[inc.source_id] = 0
-                bySource[inc.source_id] += inc.amount
-              })
+        const bySource: Record<string, number> = {}
+        incomesOfDay.forEach((inc) => {
+          if (!bySource[inc.source_id]) bySource[inc.source_id] = 0
+          bySource[inc.source_id] += inc.amount
+        })
 
-              return (
-                <div
-                  key={key}
-                  className={`group relative bg-white rounded-2xl p-5 transition-all duration-300 cursor-pointer ${
-                    hasIncome 
-                      ? 'border-2 border-blue-200 shadow-md hover:shadow-xl hover:-translate-y-1' 
-                      : 'border border-gray-200 hover:border-blue-200 hover:shadow-md'
-                  } ${isToday ? 'ring-2 ring-blue-400 ring-offset-2' : ''}`}
-                  onClick={() => setSelectedDayStr(key)}
-                >
-                  {/* Day Header */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex flex-col">
-                      <span className={`text-3xl font-bold ${hasIncome ? 'text-blue-600' : 'text-gray-300'} ${isToday ? 'text-blue-600' : ''}`}>
-                        {format(day, 'd')}
-                      </span>
-                      <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        {getDayName(day)}
-                      </span>
+        return (
+          <div
+            key={key}
+            className={`flex-shrink-0 w-[85vw] bg-white rounded-2xl p-6 transition-all duration-300 cursor-pointer border ${
+              hasIncome 
+                ? 'border-gray-900 shadow-lg' 
+                : 'border-gray-200'
+            } ${isToday ? 'ring-1 ring-gray-900 ring-offset-2' : ''}`}
+            style={{ scrollSnapAlign: 'center' }}
+            onClick={() => setSelectedDayStr(key)}
+          >
+            {/* Day Header */}
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex flex-col">
+                <span className={`text-5xl font-light ${hasIncome ? 'text-gray-900' : 'text-gray-300'}`}>
+                  {format(day, 'd')}
+                </span>
+                <span className="text-sm font-normal text-gray-400 tracking-wide mt-1">
+                  {getDayName(day)}
+                </span>
+              </div>
+              
+              {isToday && (
+                <div className="w-3 h-3 bg-gray-900 rounded-full"></div>
+              )}
+            </div>
+
+            {/* Income Content */}
+            <div className="mb-6">
+              {hasIncome ? (
+                <div className="space-y-4">
+                  {/* Total */}
+                  <div>
+                    <p className="text-sm text-gray-400 font-normal mb-2">
+                      Total
+                    </p>
+                    <p className="text-3xl font-light text-gray-900">
+                      ${total.toLocaleString('es-CO')}
+                    </p>
+                  </div>
+                  
+                  {/* Sources Breakdown */}
+                  {Object.keys(bySource).length > 0 && (
+                    <div className="space-y-2 pt-4 border-t border-gray-100">
+                      {Object.entries(bySource).map(([sourceId, amount], i) => {
+                        const source = sources.find(s => s.id === sourceId)
+                        return (
+                          <div 
+                            key={i} 
+                            className="flex items-center justify-between"
+                          >
+                            <span className="text-sm font-normal text-gray-400 truncate flex-1">
+                              {source?.name.replace(/YouTube\s?|Facebook\s?|TikTok\s?/gi, '')}
+                            </span>
+                            <span className="text-sm font-normal text-gray-600 ml-2">
+                              ${amount.toLocaleString('es-CO')}
+                            </span>
+                          </div>
+                        )
+                      })}
                     </div>
-                    
-                    {hasIncome ? (
-                      <div className="flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-full">
-                        <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                        <span className="text-xs font-bold text-emerald-700">Activo</span>
-                      </div>
-                    ) : isToday ? (
-                      <div className="flex items-center gap-1.5 bg-blue-50 px-2.5 py-1 rounded-full">
-                        <span className="text-xs font-bold text-blue-700">Hoy</span>
-                      </div>
-                    ) : null}
-                  </div>
-
-                  {/* Income Content */}
-                  <div className="mb-4">
-                    {hasIncome ? (
-                      <div className="space-y-3">
-                        {/* Total */}
-                        <div className="p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl">
-                          <p className="text-xs text-gray-600 font-medium mb-1">Total del día</p>
-                          <p className="text-xl font-bold text-gray-900">
-                            ${total.toLocaleString('es-CO')}
-                          </p>
-                        </div>
-                        
-                        {/* Sources Breakdown */}
-                        <div className="space-y-1.5 max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-                          {Object.entries(bySource).map(([sourceId, amount], i) => {
-                            const source = sources.find(s => s.id === sourceId)
-                            return (
-                              <div 
-                                key={i} 
-                                className="flex items-center justify-between p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                              >
-                                <span className="text-xs font-medium text-gray-700 truncate flex-1">
-                                  {source?.name.replace(/YouTube\s?|Facebook\s?|TikTok\s?/gi, '')}
-                                </span>
-                                <span className="text-xs font-bold text-gray-900 ml-2 whitespace-nowrap">
-                                  ${amount.toLocaleString('es-CO')}
-                                </span>
-                              </div>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center py-6">
-                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-2 group-hover:bg-blue-50 transition-colors">
-                          <Plus className="w-6 h-6 text-gray-400 group-hover:text-blue-500 transition-colors" />
-                        </div>
-                        <p className="text-xs text-gray-400 font-medium">Sin datos</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Action Button */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setSelectedDayStr(key)
-                    }}
-                    className={`w-full py-2.5 px-4 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
-                      hasIncome
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md'
-                        : 'bg-gray-100 hover:bg-blue-50 text-gray-700 hover:text-blue-700'
-                    }`}
-                  >
-                    {hasIncome ? (
-                      <>
-                        <Edit3 className="w-4 h-4" />
-                        Editar
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="w-4 h-4" />
-                        Agregar
-                      </>
-                    )}
-                  </button>
-
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/0 to-indigo-500/0 group-hover:from-blue-500/5 group-hover:to-indigo-500/5 pointer-events-none transition-all duration-300"></div>
+                  )}
                 </div>
-              )
-            })}
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="w-16 h-16 flex items-center justify-center mb-3">
+                    <Plus className="w-10 h-10 text-gray-300" strokeWidth={1.5} />
+                  </div>
+                  <p className="text-sm text-gray-400">Sin datos</p>
+                </div>
+              )}
+            </div>
+
+            {/* Action Button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                setSelectedDayStr(key)
+              }}
+              className={`w-full py-3 px-4 rounded-xl font-normal text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
+                hasIncome
+                  ? 'bg-gray-900 text-white active:bg-gray-800'
+                  : 'bg-gray-100 text-gray-700 active:bg-gray-200'
+              }`}
+            >
+              {hasIncome ? (
+                <>
+                  <Edit3 className="w-4 h-4" strokeWidth={2} />
+                  Editar
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4" strokeWidth={2} />
+                  Agregar
+                </>
+              )}
+            </button>
           </div>
+        )
+      })}
+    </div>
+  </div>
+
+  {/* Desktop: Grid */}
+  <div className="hidden lg:grid grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-4 lg:gap-6">
+    {days.map((day) => {
+      const key = format(day, 'yyyy-MM-dd')
+      const total = incomeMap[key] || 0
+      const incomesOfDay = incomeDetailsMap[key] || []
+      const hasIncome = total > 0
+      const isToday = format(new Date(), 'yyyy-MM-dd') === key
+
+      const bySource: Record<string, number> = {}
+      incomesOfDay.forEach((inc) => {
+        if (!bySource[inc.source_id]) bySource[inc.source_id] = 0
+        bySource[inc.source_id] += inc.amount
+      })
+
+      return (
+        <div
+          key={key}
+          className={`group relative bg-white rounded-2xl p-4 transition-all duration-300 cursor-pointer border ${
+            hasIncome 
+              ? 'border-gray-900 hover:shadow-lg' 
+              : 'border-gray-200 hover:border-gray-400'
+          } ${isToday ? 'ring-1 ring-gray-900 ring-offset-2' : ''}`}
+          onClick={() => setSelectedDayStr(key)}
+        >
+          {/* Day Header */}
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex flex-col">
+              <span className={`text-3xl font-light ${hasIncome ? 'text-gray-900' : 'text-gray-300'}`}>
+                {format(day, 'd')}
+              </span>
+              <span className="text-xs font-normal text-gray-400 tracking-wide">
+                {getDayName(day)}
+              </span>
+            </div>
+            
+            {isToday && (
+              <div className="w-2 h-2 bg-gray-900 rounded-full"></div>
+            )}
+          </div>
+
+          {/* Income Content */}
+          <div className="mb-4">
+            {hasIncome ? (
+              <div className="space-y-3">
+                {/* Total */}
+                <div>
+                  <p className="text-xs text-gray-400 font-normal mb-1">
+                    Total
+                  </p>
+                  <p className="text-xl font-light text-gray-900">
+                    ${total.toLocaleString('es-CO')}
+                  </p>
+                </div>
+                
+                {/* Sources Breakdown */}
+                {Object.keys(bySource).length > 1 && (
+                  <div className="space-y-1 pt-2 border-t border-gray-100">
+                    {Object.entries(bySource).slice(0, 2).map(([sourceId, amount], i) => {
+                      const source = sources.find(s => s.id === sourceId)
+                      return (
+                        <div 
+                          key={i} 
+                          className="flex items-center justify-between"
+                        >
+                          <span className="text-xs font-normal text-gray-400 truncate flex-1">
+                            {source?.name.replace(/YouTube\s?|Facebook\s?|TikTok\s?/gi, '')}
+                          </span>
+                          <span className="text-xs font-normal text-gray-600 ml-2">
+                            ${amount.toLocaleString('es-CO')}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-4">
+                <div className="w-10 h-10 flex items-center justify-center mb-2">
+                  <Plus className="w-6 h-6 text-gray-300 group-hover:text-gray-900 transition-colors" strokeWidth={1.5} />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Action Button - Only visible on hover */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              setSelectedDayStr(key)
+            }}
+            className={`w-full py-2 px-3 rounded-lg font-normal text-xs transition-all duration-200 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 ${
+              hasIncome
+                ? 'bg-gray-900 text-white hover:bg-gray-800'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {hasIncome ? (
+              <>
+                <Edit3 className="w-3 h-3" strokeWidth={2} />
+                Editar
+              </>
+            ) : (
+              <>
+                <Plus className="w-3 h-3" strokeWidth={2} />
+                Agregar
+              </>
+            )}
+          </button>
         </div>
+      )
+    })}
+  </div>
+</div>
       </div>
 
       {selectedDay && (
