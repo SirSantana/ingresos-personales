@@ -9,6 +9,7 @@ import MonthlyView from "../components/MonthlyView"
 import IncomeReportChart from "../components/IncomeReportChart"
 import ProgressBarRituals from "../components/ProgressBarRituals"
 import IncomeStatisticsCard from "../components/IncomeStadisticsCard"
+import IncomeChart from "../components/IncomeChart"
 
 
 export default function DashboardPage() {
@@ -38,6 +39,7 @@ export default function DashboardPage() {
       <IncomeOverview totalIncome={modeGlobal === 'month' ? incomeMonth : totalYear} goal={modeGlobal==='month' ? 2500: 25000} modeGlobal={modeGlobal} />
       <IncomeStatisticsCard totalIncome={modeGlobal === 'month' ? incomeMonth : totalYear} lastMonthIncome={incomeMonth} />
       {/* <ProgressBarRituals progress={40} /> */}
+      
       
       {modeGlobal === 'month' && (
         <MonthlyView selectedDate={date} year={year} month={date.getMonth() + 1} setIncomeMonth={setIncomeMonth} />
