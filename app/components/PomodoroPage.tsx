@@ -112,7 +112,11 @@ export default function PomodoroTimer() {
       <div className="max-w-2xl w-full text-center">
         <h1 className="text-4xl font-light text-gray-900 tracking-tight mb-6">Enfoque Profundo</h1>
 
-        <div className="inline-flex items-center gap-2 p-1 bg-gray-100 rounded-2xl mb-20">
+        <div   className="
+              flex sm:inline-flex items-center gap-2 p-1 bg-gray-100 rounded-2xl
+              overflow-x-auto sm:overflow-visible scrollbar-hide
+              snap-x snap-mandatory
+            ">
           {[
             { key: 'focus', label: 'Enfoque', icon: Target },
             { key: 'break', label: 'Descanso', icon: Coffee },
@@ -125,7 +129,7 @@ export default function PomodoroTimer() {
                 mode === key ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'
               }`}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis">
                 <Icon className="w-4 h-4" strokeWidth={1.5} />
                 {label}
               </div>
