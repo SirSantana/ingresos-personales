@@ -10,6 +10,7 @@ import IncomeReportChart from "../components/IncomeReportChart"
 import ProgressBarRituals from "../components/ProgressBarRituals"
 import IncomeStatisticsCard from "../components/IncomeStadisticsCard"
 import IncomeChart from "../components/IncomeChart"
+import AffirmationsPage from "../components/AffirmationsPage"
 
 
 export default function DashboardPage() {
@@ -45,6 +46,7 @@ export default function DashboardPage() {
         <MonthlyView selectedDate={date} year={year} month={date.getMonth() + 1} setIncomeMonth={setIncomeMonth} />
       )}
       {modeGlobal === 'year' &&  <IncomeReportChart />}
+      <AffirmationsPage/>
      
       {/* IncomeTable opcional */}
      

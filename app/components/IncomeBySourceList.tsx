@@ -140,7 +140,7 @@ export default function IncomeBySourceList({
                         <img
                           src={source.logo}
                           alt={`${source.name} logo`}
-                          className="w-12 h-12 object-contain opacity-40"
+                          className="w-12 h-12 object-contain"
                         />
                       ) : (
                         <span className="text-3xl font-light text-gray-300">
