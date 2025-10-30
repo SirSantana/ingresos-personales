@@ -11,6 +11,8 @@ import ProgressBarRituals from "../components/ProgressBarRituals"
 import IncomeStatisticsCard from "../components/IncomeStadisticsCard"
 import IncomeChart from "../components/IncomeChart"
 import AffirmationsPage from "../components/AffirmationsPage"
+import PomodoroTimer from "../components/PomodoroPage"
+import WaterReadingTracker from "../components/WaterReadingTracker"
 
 
 export default function DashboardPage() {
@@ -47,6 +49,8 @@ export default function DashboardPage() {
       )}
       {modeGlobal === 'year' &&  <IncomeReportChart />}
       <AffirmationsPage/>
+      <PomodoroTimer />
+      <WaterReadingTracker />
      
       {/* IncomeTable opcional */}
      

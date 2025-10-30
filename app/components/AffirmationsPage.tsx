@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import { Heart, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -44,11 +46,11 @@ export default function AffirmationsPage() {
   const currentList = activeTab === 'affirmation' ? affirmations : gratitudes
 
   const handlePrevious = () => {
-    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : currentList.length - 1))
+    setCurrentIndex(prev => (prev > 0 ? prev - 1 : currentList.length - 1))
   }
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev < currentList.length - 1 ? prev + 1 : 0))
+    setCurrentIndex(prev => (prev < currentList.length - 1 ? prev + 1 : 0))
   }
 
   const handleRandom = () => {
@@ -69,14 +71,20 @@ export default function AffirmationsPage() {
             Poder Mental
           </h1>
           
-          {/* Tab Selector */}
-          <div className="inline-flex items-center gap-2 p-1 bg-gray-100 rounded-2xl">
+          {/* ✅ Responsive Tab Selector */}
+          <div
+            className="
+              flex sm:inline-flex items-center gap-2 p-1 bg-gray-100 rounded-2xl
+              overflow-x-auto sm:overflow-visible scrollbar-hide
+              snap-x snap-mandatory
+            "
+          >
             <button
               onClick={() => {
                 setActiveTab('affirmation')
                 setCurrentIndex(0)
               }}
-              className={`px-6 py-2.5 rounded-xl text-sm font-normal transition-all ${
+              className={`flex-shrink-0 snap-center px-6 py-2.5 rounded-xl text-sm font-normal transition-all ${
                 activeTab === 'affirmation'
                   ? 'bg-white text-gray-900 shadow-sm'
                   : 'text-gray-500 hover:text-gray-900'
@@ -87,12 +95,13 @@ export default function AffirmationsPage() {
                 Afirmaciones
               </div>
             </button>
+
             <button
               onClick={() => {
                 setActiveTab('gratitude')
                 setCurrentIndex(0)
               }}
-              className={`px-6 py-2.5 rounded-xl text-sm font-normal transition-all ${
+              className={`flex-shrink-0 snap-center px-6 py-2.5 rounded-xl text-sm font-normal transition-all ${
                 activeTab === 'gratitude'
                   ? 'bg-white text-gray-900 shadow-sm'
                   : 'text-gray-500 hover:text-gray-900'
@@ -179,7 +188,6 @@ export default function AffirmationsPage() {
             {currentIndex + 1} de {currentList.length}
           </p>
         </div>
-        
       </div>
     </div>
   )
