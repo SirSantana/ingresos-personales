@@ -13,6 +13,8 @@ import IncomeChart from "../components/IncomeChart"
 import AffirmationsPage from "../components/AffirmationsPage"
 import PomodoroTimer from "../components/PomodoroPage"
 import WaterReadingTracker from "../components/WaterReadingTracker"
+import IncomeCalendar from "../components/IncomeCalendar"
+import QuarterlyGoals from "../components/QuarerlyGoalsPage"
 
 
 export default function DashboardPage() {
@@ -41,6 +43,7 @@ export default function DashboardPage() {
     
       <IncomeOverview totalIncome={modeGlobal === 'month' ? incomeMonth : totalYear} goal={modeGlobal==='month' ? 2500: 25000} modeGlobal={modeGlobal} />
       <IncomeStatisticsCard totalIncome={modeGlobal === 'month' ? incomeMonth : totalYear} lastMonthIncome={incomeMonth} />
+      
       {/* <ProgressBarRituals progress={40} /> */}
       
       
@@ -51,6 +54,7 @@ export default function DashboardPage() {
       <AffirmationsPage/>
       <PomodoroTimer />
       <WaterReadingTracker />
+      <QuarterlyGoals />
      
       {/* IncomeTable opcional */}
      

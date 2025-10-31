@@ -16,6 +16,7 @@ import { sources } from './IncomeReportChart'
 import IncomeBySourceList from './IncomeBySourceList'
 import { Plus, Edit3, Sparkles } from 'lucide-react'
 import IncomeChart from './IncomeChart'
+import IncomeCalendar from './IncomeCalendar'
 
 const IncomeEditor = dynamic(() => import('./IncomeEditor'), { ssr: false })
 
@@ -94,6 +95,7 @@ export default function MonthlyView({
   </div>
 )}
 <IncomeChart incomes={incomes} />
+<IncomeCalendar year={year} month={month} incomes={incomes} />
         {/* Daily Income Grid */}
         <div>
   <div className="text-center mb-20">
