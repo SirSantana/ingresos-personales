@@ -51,6 +51,7 @@ export default function DashboardPage() {
         <MonthlyView selectedDate={date} year={year} month={date.getMonth() + 1} setIncomeMonth={setIncomeMonth} />
       )}
       {modeGlobal === 'year' &&  <IncomeReportChart />}
+      
       <AffirmationsPage/>
       <PomodoroTimer />
       <WaterReadingTracker />
