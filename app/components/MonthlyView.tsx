@@ -85,6 +85,7 @@ export default function MonthlyView({
   return (
     <>
       <div className="max-w-7xl mx-auto">
+<IncomeCalendar year={year} month={month} incomes={incomes} />
         
         {/* Income by Source Section */}
         {incomes.length > 0 && (
@@ -96,7 +97,6 @@ export default function MonthlyView({
   </div>
 )}
 <IncomeChart incomes={incomes} />
-<IncomeCalendar year={year} month={month} incomes={incomes} />
 <IncomeBarChart incomes={incomes}  sources={sources} />
         {/* Daily Income Grid */}
         <div>
