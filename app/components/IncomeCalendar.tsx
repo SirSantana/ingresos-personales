@@ -94,26 +94,8 @@ export default function IncomeCalendar({
 
   return (
     <div className="min-h-screen w-full px-6 py-12">
-      <div className="max-w-5xl mx-auto w-full">
-        
-        {/* Header */}
-        <div className="text-center mb-20">
-          <h1 className="text-4xl font-light text-gray-900 tracking-tight mb-6">
-            Calendario de Ingresos
-          </h1>
-        </div>
-
-        {/* Stats Summary */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mb-16">
-          <div className="text-center">
-            <p className="text-sm font-normal text-gray-400 mb-3 tracking-wide">
-              Mejor Día
-            </p>
-            <p className="text-2xl sm:text-3xl font-light text-gray-900">
-              {formatCurrency(bestDay.income)}
-            </p>
-          </div>
-        </div>
+      <div className="justify-between max-w-5xl mx-auto w-full">
+      
 
         {/* Calendar Navigation */}
         <div className="flex items-center justify-between mb-8">
@@ -176,17 +158,16 @@ export default function IncomeCalendar({
             )
           })}
         </div>
-
-        {/* Legend */}
-        <div className="text-center px-4">
-          <p className="text-xs font-normal text-gray-400 mb-2 sm:mb-4">
-            💰 = Ingresos del día (en miles)
-          </p>
-          <p className="text-xs font-normal text-gray-500">
-            Los días con borde negro indican ingresos registrados
-          </p>
-        </div>
-        
+          {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mb-16">
+          <div className="text-center">
+            <p className="text-sm font-normal text-gray-400 mb-3 tracking-wide">
+              Mejor Día
+            </p>
+            <p className="text-2xl sm:text-3xl font-light text-gray-900">
+              {formatCurrency(bestDay.income)}
+            </p>
+          </div>
+        </div> */}
       </div>
     </div>
   )
