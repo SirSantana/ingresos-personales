@@ -18,6 +18,7 @@ import { Plus, Edit3, Sparkles } from 'lucide-react'
 import IncomeChart from './IncomeChart'
 import IncomeCalendar from './IncomeCalendar'
 import IncomeBarChart from './IncomeBarChart'
+import DailyIncomeViewer from './DailyIncomeOverview'
 
 const IncomeEditor = dynamic(() => import('./IncomeEditor'), { ssr: false })
 
@@ -98,6 +99,10 @@ export default function MonthlyView({
 )}
 <IncomeChart incomes={incomes} />
 <IncomeBarChart incomes={incomes}  sources={sources} />
+<DailyIncomeViewer 
+  incomes={incomes}
+  initialDate={new Date()}
+/>
         {/* Daily Income Grid */}
         <div>
   <div className="text-center mb-20">

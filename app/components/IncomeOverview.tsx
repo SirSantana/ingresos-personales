@@ -84,7 +84,7 @@ export default function IncomeOverview({
       </div>
 
       {/* Mobile Navigation Bar */}
-      <div className={`fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 lg:hidden z-50 transition-transform duration-300 ${
+      {/* <div className={`fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 lg:hidden z-50 transition-transform duration-300 ${
         showMobileNav ? 'translate-y-0' : 'translate-y-full'
       }`}>
         <div className="grid grid-cols-4 gap-2 max-w-md mx-auto mb-2">
@@ -117,7 +117,7 @@ export default function IncomeOverview({
             )
           })}
         </div>
-      </div>
+      </div> */}
 
       {/* Main Content */}
       <div className="w-full max-w-4xl flex flex-col justify-center lg:pb-0" style={{ minHeight: '80vh' }}>
