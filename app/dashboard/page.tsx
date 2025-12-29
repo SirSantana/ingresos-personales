@@ -15,6 +15,7 @@ import PomodoroTimer from "../components/PomodoroPage"
 import WaterReadingTracker from "../components/WaterReadingTracker"
 import IncomeCalendar from "../components/IncomeCalendar"
 import QuarterlyGoals from "../components/QuarerlyGoalsPage"
+import MilestoneTracker from "../components/MilestoneTracker"
 
 
 export default function DashboardPage() {
@@ -51,7 +52,7 @@ export default function DashboardPage() {
         <MonthlyView selectedDate={date} year={year} month={date.getMonth() + 1} setIncomeMonth={setIncomeMonth} />
       )}
       {modeGlobal === 'year' &&  <IncomeReportChart />}
-      
+      <MilestoneTracker />
       <AffirmationsPage/>
       <PomodoroTimer />
       <WaterReadingTracker />
