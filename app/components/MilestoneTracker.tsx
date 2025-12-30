@@ -279,7 +279,7 @@ export default function MilestoneTracker() {
     )
   }
 
-  return (
+ return (
     <div className="min-h-screen w-full flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
       <div className="w-full max-w-7xl">
         
@@ -289,7 +289,7 @@ export default function MilestoneTracker() {
             <Target className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" strokeWidth={1.5} />
           </div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-light text-gray-900 tracking-tight mb-2 sm:mb-3">
-            Metas y Hitos
+            Metas e Hitos
           </h2>
           <p className="text-sm sm:text-base font-light text-gray-400">
             {goals.length} {goals.length === 1 ? 'meta activa' : 'metas activas'}
@@ -306,11 +306,7 @@ export default function MilestoneTracker() {
               : 0
 
             return (
-              <div 
-                key={goal.id} 
-                className="relative bg-white border-b border-gray-100 sm:border sm:rounded-2xl overflow-hidden transition-all
-                           w-[100vw] ml-[50%] -translate-x-1/2 sm:w-full sm:ml-0 sm:translate-x-0"
-              >
+              <div key={goal.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden  w-[100vw] ml-[50%] -translate-x-1/2 sm:w-full sm:ml-0 sm:translate-x-0">
                 
                 {/* Goal Header */}
                 <div className="p-6 sm:p-8">
@@ -329,10 +325,7 @@ export default function MilestoneTracker() {
                           </button>
                         )}
                       </div>
-                      <div className="flex items-baseline gap-3 text-sm sm:text-base font-light text-gray-400">
-                        <span>{formatValue(goal.current_amount || 0, goal.type, goal.unit)}</span>
-                        <span>de {formatValue(goal.final_goal, goal.type, goal.unit)}</span>
-                      </div>
+                      
                     </div>
                     
                     <button
@@ -367,85 +360,93 @@ export default function MilestoneTracker() {
                   <div className="px-6 sm:px-8 pb-6 sm:pb-8">
                     
                     {totalMilestones > 0 ? (
-                      <div className="mb-10 relative">
-                        {/* Contenedor con scroll solo en mobile */}
-                        <div className="overflow-x-auto pb-6 -mx-6 px-6 sm:mx-0 sm:px-0 scrollbar-hide">
-                          <div className="relative min-w-full">
+                      <div className="mb-6">
+                        <div className="overflow-x-auto pb-4 -mx-6 px-6 sm:-mx-8 sm:px-8">
+                          <div className="relative" style={{ minWidth: 'max-content' }}>
                             
                             {/* Connection Line */}
                             {totalMilestones > 1 && (
-                              <div className="absolute top-5 sm:top-6 left-0 right-0 h-[2px] z-0">
-                                {/* Línea Gris de fondo (Base) - Siempre visible */}
+                              <div className="absolute top-5 sm:top-6 left-0 right-0 h-px">
+                                {/* Gray background line */}
                                 <div 
                                   className="absolute h-full bg-gray-200"
                                   style={{ 
-                                    left: `calc(50% / ${totalMilestones})`,
-                                    right: `calc(50% / ${totalMilestones})`,
-                                    width: `calc(100% - (100% / ${totalMilestones}))`
+                                    left: '20px',
+                                    right: '20px'
                                   }}
                                 />
-                                {/* Línea Negra de progreso (Dinámica) */}
+                                {/* Black progress line */}
                                 <div 
                                   className="absolute h-full bg-gray-900 transition-all duration-500 ease-out"
                                   style={{ 
-                                    left: `calc(50% / ${totalMilestones})`,
+                                    left: '20px',
                                     width: (() => {
-                                      // Encontrar el último hito completado
-                                      let lastCompletedIndex = -1;
+                                      // Find last completed milestone index
+                                      let lastCompletedIndex = -1
                                       goal.milestones?.forEach((m, i) => {
-                                        if (m.completed) lastCompletedIndex = i;
-                                      });
+                                        if (m.completed) lastCompletedIndex = i
+                                      })
                                       
-                                      if (lastCompletedIndex === -1) return '0%';
+                                      if (lastCompletedIndex === -1) return '0'
                                       
-                                      // Calcular el porcentaje de progreso
-                                      const segmentWidth = 100 / (totalMilestones - 1);
-                                      return `${segmentWidth * lastCompletedIndex}%`;
+                                      // Calculate width based on milestone positions
+                                      const gapSize = 6 * 4 // gap-6 = 24px (6 * 4px)
+                                      const milestoneWidth = 80 // min-w-[80px]
+                                      const totalWidth = (milestoneWidth * totalMilestones) + (gapSize * (totalMilestones - 1))
+                                      const progressWidth = (milestoneWidth * lastCompletedIndex) + (gapSize * lastCompletedIndex)
+                                      
+                                      return `${progressWidth}px`
                                     })()
                                   }}
                                 />
                               </div>
                             )}
-
-                            {/* Milestones Container */}
-                            <div className="flex items-start justify-between min-w-full relative z-10 w-[100vw] ml-[50%] -translate-x-1/2 sm:w-full sm:ml-0 sm:translate-x-0">
+                            
+                            {/* Milestones */}
+                            <div className="flex items-start gap-6 sm:gap-8 lg:gap-12">
                               {goal.milestones?.map((milestone) => (
                                 <div 
                                   key={milestone.id}
-                                  className="flex flex-col items-center gap-3 relative group flex-shrink-0"
-                                  style={{ width: 'clamp(100px, calc(100% / ' + totalMilestones + '), 100%)' }}
+                                  className="flex flex-col items-center gap-3 relative group min-w-[80px]"
                                 >
                                   {/* Milestone Button */}
                                   <button
                                     onClick={() => toggleMilestone(goal.id, milestone.id)}
                                     onContextMenu={(e) => handleContextMenu(e, goal.id, milestone.id)}
-                                    className={`relative w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 transition-all duration-300 z-10 
-                                      flex items-center justify-center active:scale-95 
-                                      ${milestone.completed ? 'bg-gray-900 border-gray-900 shadow-md' : 'bg-white border-gray-200 hover:border-gray-400'}`}
+                                    className={`relative w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 transition-all duration-300 flex items-center justify-center z-10 ${
+                                      milestone.completed
+                                        ? 'bg-gray-900 border-gray-900'
+                                        : 'bg-white border-gray-200 hover:border-gray-400'
+                                    }`}
                                   >
                                     {milestone.completed && (
-                                      <Check className="w-4 h-4 text-white" strokeWidth={3} />
+                                      <Check className="w-4 h-4 sm:w-5 sm:h-5 text-white" strokeWidth={2} />
                                     )}
                                   </button>
 
                                   {/* Amount Label */}
-                                  <div className="text-center w-full px-2">
-                                    <p className={`text-xs sm:text-sm font-light transition-colors truncate ${
+                                  <div className="text-center w-full">
+                                    <p className={`text-xs sm:text-sm font-light transition-colors ${
                                       milestone.completed ? 'text-gray-900 font-medium' : 'text-gray-400'
                                     }`}>
                                       {formatValue(milestone.amount, goal.type, goal.unit)}
                                     </p>
+                                    {milestone.label && (
+                                      <p className="text-[10px] text-gray-400 mt-1">
+                                        {milestone.label}
+                                      </p>
+                                    )}
                                   </div>
 
-                                  {/* Delete Button (Solo Desktop) */}
+                                  {/* Delete Button */}
                                   <button
                                     onClick={(e) => {
-                                      e.stopPropagation();
-                                      removeMilestone(goal.id, milestone.id);
+                                      e.stopPropagation()
+                                      removeMilestone(goal.id, milestone.id)
                                     }}
-                                    className="hidden sm:group-hover:flex absolute -top-1 -right-1 w-5 h-5 bg-gray-900 text-white rounded-full items-center justify-center shadow-sm"
+                                    className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-gray-900 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                                   >
-                                    <X className="w-3 h-3" />
+                                    <X className="w-3 h-3" strokeWidth={2} />
                                   </button>
                                 </div>
                               ))}

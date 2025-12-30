@@ -8,19 +8,15 @@ interface Income {
 }
 
 interface IncomeCalendarProps {
-  year?: number
-  month?: number
   incomes?: Income[]
 }
 
 export default function IncomeCalendar({
-  year = new Date().getFullYear(),
-  month = new Date().getMonth(),
   incomes = []
 }: IncomeCalendarProps) {
-  const [currentYear, setCurrentYear] = useState(year)
-  const [currentMonth, setCurrentMonth] = useState(month)
-
+ const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
+  
   const months = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
