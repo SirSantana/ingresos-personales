@@ -86,7 +86,7 @@ export default function MonthlyView({
   return (
     <>
       <div className="max-w-7xl mx-auto">
-<IncomeCalendar year={year} month={month} incomes={incomes} />
+<IncomeCalendar  incomes={incomes} />
         
         {/* Income by Source Section */}
         {incomes.length > 0 && (
