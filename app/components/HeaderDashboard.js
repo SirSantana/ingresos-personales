@@ -2,7 +2,7 @@ import { format } from 'date-fns'
 import { useState } from 'react'
 import { Calendar, ChevronDown } from 'lucide-react'
 
-export default function Header({ selectedDate, onChange, setModeGlobal }) {
+export default function Header({ selectedDate, onChange, setModeGlobal, setYear }) {
   const [mode, setMode] = useState('month') // 'month' o 'year'
 
   const handleMode = (e) => {
@@ -13,6 +13,8 @@ export default function Header({ selectedDate, onChange, setModeGlobal }) {
   const handleMonthChange = (e) => {
     const [year, month] = e.target.value.split('-')
     onChange(new Date(year, month - 1))
+    setYear(year)
+
   }
 
   const handleYearChange = (e) => {

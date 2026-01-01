@@ -25,12 +25,11 @@ export default function DashboardPage() {
   const [month, setMonth] = useState<number | null>(null)
   const [totalYear, setTotalYear] = useState<number>(0)
   
-  const [year, setYear]= useState<number>(2025)
+  const [year, setYear]= useState<number>(date.getFullYear())
 
   
-
   const fetchTotalYear = async () => {
-    const { data, error } = await supabase.rpc('get_total_income_by_year', { year: year })
+    const { data, error } = await supabase.rpc('get_total_income_by_year', { year: year})
     if (!error) setTotalYear(data || 0)
   }
  
@@ -40,7 +39,7 @@ export default function DashboardPage() {
   
   return (
     <DashboardLayout>
-      <Header setModeGlobal={setModeGlobal} selectedDate={date} onChange={setDate} />
+      <Header setModeGlobal={setModeGlobal} selectedDate={date} onChange={setDate} setYear={setYear}/>
     
       <IncomeOverview totalIncome={modeGlobal === 'month' ? incomeMonth : totalYear} goal={modeGlobal==='month' ? 2500: 25000} modeGlobal={modeGlobal} />
       <IncomeStatisticsCard totalIncome={modeGlobal === 'month' ? incomeMonth : totalYear} lastMonthIncome={incomeMonth} />
