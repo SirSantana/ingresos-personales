@@ -16,6 +16,7 @@ import WaterReadingTracker from "../components/WaterReadingTracker"
 import IncomeCalendar from "../components/IncomeCalendar"
 import QuarterlyGoals from "../components/QuarerlyGoalsPage"
 import MilestoneTracker from "../components/MilestoneTracker"
+import IncomeMilestones from "../components/IncomeMilestones"
 
 
 export default function DashboardPage() {
@@ -42,6 +43,7 @@ export default function DashboardPage() {
       <Header setModeGlobal={setModeGlobal} selectedDate={date} onChange={setDate} setYear={setYear}/>
     
       <IncomeOverview totalIncome={modeGlobal === 'month' ? incomeMonth : totalYear} goal={modeGlobal==='month' ? 2500: 25000} modeGlobal={modeGlobal} />
+      <IncomeMilestones totalIncome={modeGlobal === 'month' ? incomeMonth : totalYear} modeGlobal={modeGlobal}  />
       <IncomeStatisticsCard totalIncome={modeGlobal === 'month' ? incomeMonth : totalYear} lastMonthIncome={incomeMonth} />
       
       {/* <ProgressBarRituals progress={40} /> */}
